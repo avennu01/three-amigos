@@ -17,12 +17,18 @@ library("ggmap")
 #install.packages("mapproj")  ##Here in case you need to load
 library("mapproj")
 library("ggplot2")
+#install.packages("repmis")
+library("repmis")
 ```
 
 ##Load the data
 ```{r loading data}
   #getwd() ##Get the present directory, where the data file should reside
-dat_crime <- read_csv(unzip("train.csv.zip"))  ##Load the compressed data
+    #dat_crime <- read_csv(unzip("train.csv.zip")) 
+##Michael: Since GitHub has an issue storing large files and each time you call 'unzip', it places the large file in the folder.  So I loaded the file into a DropBox folder for sharing
+dat_crime <- read_csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
+
+
   #table(dat_crime$Category)
 #dat_crime %>% plot(dat_crime, x = dat_crime$X, y = dat_crime$Y, type = "p")
 #plot(dat_crime$X, dat_crime$Y, type = "p")
@@ -56,7 +62,7 @@ ggmap(map_SF)
 
 ```{r ggmap plus points}
 ## install.packages("rgbif") ##For insatl
-library("rgbif")
+#library("rgbif")  #Decided that this is not useful, but leaving here for now
 ##
 map_SF <- get_map(location = "San Francisco", zoom = 13)
 
@@ -90,16 +96,19 @@ ggmap(map_SF_1) +
 
 
 ```{r first walking path + crime}
-#Trying to find crime nearby
-dat_crime_route_1 <- dat_crime %>% filter( Y <= 37.8028, Y >= 37.8027)
 
+walking_route_1
+
+#Trying to find crime nearby
+dat_crime_route_1 <- dat_crime %>% filter(Y <= (walking_route_1$lat[1] + 0.0001),Y >= (walking_route_1$lat[1] - 0.0001),X <= (walking_route_1$lon[1] - 0.001), X >= -122.408)
+#dat_crime_route_1 %>% select(X, Y)
 
 ##This just renders the crime within the lat/lon constraints of how the map was centered
 ggmap(map_SF_1) + 
     geom_path(data = walking_route_1,
         aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
     ) + 
-  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.2, size=0.5, color="red")
+  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=1, size=3, color="red")
 
 
 ```
