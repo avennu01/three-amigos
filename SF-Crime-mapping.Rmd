@@ -1,0 +1,107 @@
+---
+title: "SF-Crime-mapping"
+author: "Michael Woolfe"
+date: "April 21, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+rm(list=ls()) ##Clear workingspace
+
+library("dplyr")
+library("tidyr")
+library("readr")
+library("ggmap")
+#install.packages("rworldmap")
+#library("rworldmap")
+#install.packages("mapproj")  ##Here in case you need to load
+library("mapproj")
+library("ggplot2")
+```
+
+##Load the data
+```{r loading data}
+  #getwd() ##Get the present directory, where the data file should reside
+dat_crime <- read_csv(unzip("train.csv.zip"))  ##Load the compressed data
+  #table(dat_crime$Category)
+#dat_crime %>% plot(dat_crime, x = dat_crime$X, y = dat_crime$Y, type = "p")
+#plot(dat_crime$X, dat_crime$Y, type = "p")
+
+#x <- dat_crime$X ##Latitude
+#y <- dat_crime$Y ##Longitude
+#plot (x,y)
+#dat_crime %>% plot(.)
+
+
+
+##Using rworldmap package
+#rworld_map <- getMap(resolution = "low")
+#plot (rworld_map, xlim = c(-20, 59), ylim = c(35, 71), asp = 1)
+
+
+```
+
+```{r plain ggmap}
+
+##
+map_SF <- get_map(location = "San Francisco", zoom = 13)
+ggmap(map_SF)
+
+
+#Different views : http://www.r-bloggers.com/throw-some-throw-some-stats-on-that-mappart-1/
+
+
+```
+
+
+```{r ggmap plus points}
+## install.packages("rgbif") ##For insatl
+library("rgbif")
+##
+map_SF <- get_map(location = "San Francisco", zoom = 13)
+
+##Warning, this one looks like a mess
+ggmap(map_SF) +
+    geom_jitter(data = dat_crime, aes(X, Y), alpha=0.2, size=0.5, color="red") 
+
+
+
+##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
+```
+
+```{r first walking path}
+
+walking_from_1 <- "1 Telegraph Hill Blvd, San Francisco, CA 94133" #Colt Tower
+walking_to_1 <- "1201 Mason St, San Francisco, CA 94108"  #Cable Car museum
+walking_route_1 <- route(walking_from_1, walking_to_1, structure = 'route', mode = 'walking', alternative = FALSE)
+
+map_SF_1 <- get_map(location = "Washington Square Park, San Francisco, CA 94133", zoom = 16)
+ggmap(map_SF_1) + 
+    geom_path(data = walking_route_1,
+        aes(x = lon, y = lat), color="red", size = 1.5, lineend='round'
+    )
+
+
+##Need to figure out how to auto-focus the map
+
+#https://rpubs.com/nickbearman/r-google-map-making
+#https://www.google.com/maps/dir/Coit+Tower,+1+Telegraph+Hill+Blvd,+San+Francisco,+CA+94133/Cable+Car+Museum,+Mason+Street,+San+Francisco,+CA/@37.7991066,-122.4139408,16z/data=!3m1!4b1!4m13!4m12!1m5!1m1!1s0x8085808c40000001:0xde85b80121f2dd44!2m2!1d-122.4058222!2d37.8023949!1m5!1m1!1s0x808580f2960c5a5f:0xdfcd6cebc1ae9a35!2m2!1d-122.411488!2d37.7946268
+```
+
+
+```{r first walking path + crime}
+#Trying to find crime nearby
+dat_crime_route_1 <- dat_crime %>% filter( Y <= 37.8028, Y >= 37.8027)
+
+
+##This just renders the crime within the lat/lon constraints of how the map was centered
+ggmap(map_SF_1) + 
+    geom_path(data = walking_route_1,
+        aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
+    ) + 
+  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.2, size=0.5, color="red")
+
+
+```
+
+
