@@ -2,7 +2,7 @@
 title: "SF-Crime"
 author: "abhilash vennu"
 date: "April 5, 2016"
-updated : "April 23,2016"
+updated date: "April 23,2016"
 output: html_document
 ---
 
@@ -26,22 +26,22 @@ table(dat_crime$Category)
 
 # Missing Person .. Need more deepdive 
 
-dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
 
 dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
 
 # Based of above table, below considerations have been made 
 # Descripts to consider apart from one's selected .... ASSAULT, BATTERY,STALKING,LOITERING,
-# complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE", 
+# complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE"
 # complete categories to ingore "VANDALISM","VEHICLE THEFT"
 
-dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC"))
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC"))
 
 dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
 
 p <- dat_occ %>% spread(Descript,occurence)
 
-final_desc <- c("AGGRAVATED ASSAULT WITH","ASSAULT, AGGRAVATED, W/","ATTEMPTED HOMICIDE WITH","ATTEMPTED MAYHEM WITH","ATTEMPTED SIMPLE","BATTERY WITH","MAYHEM WITH","THREATS AGAINST","WILLFUL CRUELTY","COMMITTING PUBLIC","DISTURBING THE PEAC","MAINTAINING A PUBLIC","FOR SALE","SALE OF","UNDER INFLUENCE","UNDER THE INFLUENCE","ATTEMPTED PETTY THEFT","GRAND THEFT PICK","GRAND THEFT PURSE","PETTY THEFT","THEFT, DRUNK ROLL,","AIDED CASE, DOG","AIDED CASE, INJURED","MEGAN'S LAW","ASSAULT TO ROB WITH ","ATTEMPTED ROBBERY ON THE STREET","ATTEMPTED ROBBERY WITH","ROBBERY ON THE STREET ","ROBBERY, ARMED WITH A ","ROBBERY, BODILY","ASSAULT BY JUVENILE","SHOOTING BY JUVENILE","ANNOY OR MOLEST","STOLEN CELLULAR PHONE","STOLEN ELECTRONICS","SUSPICIOUS A","SUSPICIOUS OCCU","SUSPICIOUS PER")
+final_desc <- c("AGGRAVATED ASSAULT WITH","ASSAULT, AGGRAVATED, W/","ATTEMPTED HOMICIDE WITH","ATTEMPTED MAYHEM WITH","ATTEMPTED SIMPLE","BATTERY WITH","MAYHEM WITH","THREATS AGAINST","WILLFUL CRUELTY","COMMITTING PUBLIC","DISTURBING THE PEAC","MAINTAINING A PUBLIC","FOR SALE","SALE OF","UNDER INFLUENCE","UNDER THE INFLUENCE","ATTEMPTED PETTY THEFT","GRAND THEFT PICK","GRAND THEFT PURSE","PETTY THEFT","THEFT, DRUNK ROLL,","AIDED CASE, DOG","AIDED CASE, INJURED","MEGAN'S LAW","ASSAULT TO ROB WITH ","ATTEMPTED ROBBERY ON THE STREET","ATTEMPTED ROBBERY WITH","ROBBERY ON THE STREET ","ROBBERY, ARMED WITH A ","ROBBERY, BODILY","ASSAULT BY JUVENILE","SHOOTING BY JUVENILE","ANNOY OR MOLEST","STOLEN CELLULAR PHONE","STOLEN ELECTRONICS","SUSPICIOUS A","SUSPICIOUS OCCU","SUSPICIOUS PER","MISSING")
 
 select_desc <- function(x) { 
                    names(p %>% select(contains(x)))[-1]
@@ -49,8 +49,14 @@ select_desc <- function(x) {
 
 dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(final_desc,select_desc))),dat_crimeNew %>% filter(Category %in% c("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE")))
 
-dat_occ_final <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+# Reduction in observations
+dim(dat_crime)
+dim(dat_crimeNew)
+dim(dat_crimefinal)
 
 # Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
+dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+
 
 ```
