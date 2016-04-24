@@ -2,6 +2,7 @@
 title: "SF-Crime"
 author: "abhilash vennu"
 date: "April 5, 2016"
+updated : "April 23,2016"
 output: html_document
 ---
 
@@ -15,20 +16,19 @@ library("dplyr")
 library("tidyr")
 library("readr")
 
-dat_crime <- read_csv("/Users/abhiplayground/Desktop/train.csv")
+## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub
+
+dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
 
 table(dat_crime$Category)
 
-dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(!Category %in% c("BAD CHECKS","BRIBERY","FORGERY/COUNTERFEITING","FRAUD","GAMBLING","LIQUOR LAWS","PORNOGRAPHY/OBSCENE MAT","PROSTITUTION","SUICIDE","TREA","FAMILY OFFENSES"))
+# seperating Dates in to Date & Time and selecting below categories only, rest have been eliminated based on group consensus since they dint have impact on our end objective
 
-View(table(dat_crime %>% filter(Category == "FAMILY OFFENSES") %>% select(Descript)))
+# Missing Person .. Need more deepdive 
+
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
+
+dat_occ <- dat_crimeNew %>% group_by(Descript) %>% summarize(occurence= n())
+
 
 ```
-
-You can also embed plots, for example:
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
