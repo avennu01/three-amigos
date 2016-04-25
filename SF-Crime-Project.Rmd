@@ -59,6 +59,6 @@ dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(oc
 
 cat_life <- dat_crimefinal %>% filter(Category %in% c("ASSAULT","KIDNAPPING","MISSING PERSON","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","SUSPICIOUS OCC"))
 cat_prop <- dat_crimefinal %>% filter(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"))
-cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL",""))
+cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"))
 
 ```

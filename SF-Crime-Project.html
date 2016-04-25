@@ -166,7 +166,7 @@ dat_occ_final &lt;- dat_crimefinal %&gt;% group_by(Category,Descript) %&gt;% sum
 
 cat_life &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;ASSAULT&quot;,&quot;KIDNAPPING&quot;,&quot;MISSING PERSON&quot;,&quot;SECONDARY CODES&quot;,&quot;SEX OFFENSES FORCIBLE&quot;,&quot;SEX OFFENSES NON FORCIBLE&quot;,&quot;SUSPICIOUS OCC&quot;))
 cat_prop &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;STOLEN PROPERTY&quot;,&quot;ROBBERY&quot;,&quot;LARCENY/THEFT&quot;))
-cat_nui &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;DISORDERLY CONDUCT&quot;,&quot;DRUG/NARCOTIC&quot;,&quot;DRUNKENNESS&quot;,&quot;NON-CRIMINAL&quot;,&quot;&quot;))</code></pre>
+cat_nui &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;DISORDERLY CONDUCT&quot;,&quot;DRUG/NARCOTIC&quot;,&quot;DRUNKENNESS&quot;,&quot;NON-CRIMINAL&quot;))</code></pre>
 
 
 </div>
