@@ -63,7 +63,7 @@ img {
 <div id="header">
 <h1 class="title">SF-Crime</h1>
 <h4 class="author"><em>abhilash vennu</em></h4>
-<h4 class="date"><em>April 5, 2016</em></h4>
+<h4 class="date"><em>April 5 &amp; 23, 2016</em></h4>
 </div>
 
 
@@ -146,7 +146,7 @@ dat_occ &lt;- dat_crimeNew %&gt;% group_by(Category,Descript) %&gt;% summarize(o
 
 p &lt;- dat_occ %&gt;% spread(Descript,occurence)
 
-final_desc &lt;- c(&quot;AGGRAVATED ASSAULT WITH&quot;,&quot;ASSAULT, AGGRAVATED, W/&quot;,&quot;ATTEMPTED HOMICIDE WITH&quot;,&quot;ATTEMPTED MAYHEM WITH&quot;,&quot;ATTEMPTED SIMPLE&quot;,&quot;BATTERY WITH&quot;,&quot;MAYHEM WITH&quot;,&quot;THREATS AGAINST&quot;,&quot;WILLFUL CRUELTY&quot;,&quot;COMMITTING PUBLIC&quot;,&quot;DISTURBING THE PEAC&quot;,&quot;MAINTAINING A PUBLIC&quot;,&quot;FOR SALE&quot;,&quot;SALE OF&quot;,&quot;UNDER INFLUENCE&quot;,&quot;UNDER THE INFLUENCE&quot;,&quot;ATTEMPTED PETTY THEFT&quot;,&quot;GRAND THEFT PICK&quot;,&quot;GRAND THEFT PURSE&quot;,&quot;PETTY THEFT&quot;,&quot;THEFT, DRUNK ROLL,&quot;,&quot;AIDED CASE, DOG&quot;,&quot;AIDED CASE, INJURED&quot;,&quot;MEGAN'S LAW&quot;,&quot;ASSAULT TO ROB WITH &quot;,&quot;ATTEMPTED ROBBERY ON THE STREET&quot;,&quot;ATTEMPTED ROBBERY WITH&quot;,&quot;ROBBERY ON THE STREET &quot;,&quot;ROBBERY, ARMED WITH A &quot;,&quot;ROBBERY, BODILY&quot;,&quot;ASSAULT BY JUVENILE&quot;,&quot;SHOOTING BY JUVENILE&quot;,&quot;ANNOY OR MOLEST&quot;,&quot;STOLEN CELLULAR PHONE&quot;,&quot;STOLEN ELECTRONICS&quot;,&quot;SUSPICIOUS A&quot;,&quot;SUSPICIOUS OCCU&quot;,&quot;SUSPICIOUS PER&quot;,&quot;MISSING&quot;)
+final_desc &lt;- c(&quot;AGGRAVATED ASSAULT WITH&quot;,&quot;ASSAULT, AGGRAVATED, W/&quot;,&quot;ATTEMPTED HOMICIDE WITH&quot;,&quot;ATTEMPTED MAYHEM WITH&quot;,&quot;ATTEMPTED SIMPLE&quot;,&quot;BATTERY WITH&quot;,&quot;MAYHEM WITH&quot;,&quot;THREATS AGAINST&quot;,&quot;WILLFUL CRUELTY&quot;,&quot;COMMITTING PUBLIC&quot;,&quot;DISTURBING THE PEAC&quot;,&quot;MAINTAINING A PUBLIC&quot;,&quot;FOR SALE&quot;,&quot;SALE OF&quot;,&quot;UNDER INFLUENCE&quot;,&quot;UNDER THE INFLUENCE&quot;,&quot;ATTEMPTED PETTY THEFT&quot;,&quot;GRAND THEFT PICK&quot;,&quot;GRAND THEFT PURSE&quot;,&quot;PETTY THEFT&quot;,&quot;THEFT, DRUNK ROLL,&quot;,&quot;AIDED CASE, DOG&quot;,&quot;AIDED CASE, INJURED&quot;,&quot;ASSAULT TO ROB WITH &quot;,&quot;ATTEMPTED ROBBERY ON THE STREET&quot;,&quot;ATTEMPTED ROBBERY WITH&quot;,&quot;ROBBERY ON THE STREET &quot;,&quot;ROBBERY, ARMED WITH A &quot;,&quot;ROBBERY, BODILY&quot;,&quot;ASSAULT BY JUVENILE&quot;,&quot;SHOOTING BY JUVENILE&quot;,&quot;ANNOY OR MOLEST&quot;,&quot;STOLEN CELLULAR PHONE&quot;,&quot;STOLEN ELECTRONICS&quot;,&quot;SUSPICIOUS A&quot;,&quot;SUSPICIOUS OCCU&quot;,&quot;SUSPICIOUS PER&quot;,&quot;MISSING&quot;)
 
 select_desc &lt;- function(x) { 
                    names(p %&gt;% select(contains(x)))[-1]
@@ -160,9 +160,13 @@ dim(dat_crime)</code></pre>
 <pre class="r"><code>dim(dat_crimeNew)</code></pre>
 <pre><code>## [1] 509681     10</code></pre>
 <pre class="r"><code>dim(dat_crimefinal)</code></pre>
-<pre><code>## [1] 195721     10</code></pre>
+<pre><code>## [1] 195711     10</code></pre>
 <pre class="r"><code># Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
-dat_occ_final &lt;- dat_crimefinal %&gt;% group_by(Category,Descript) %&gt;% summarize(occurence= n())</code></pre>
+dat_occ_final &lt;- dat_crimefinal %&gt;% group_by(Category,Descript) %&gt;% summarize(occurence= n())
+
+cat_life &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;ASSAULT&quot;,&quot;KIDNAPPING&quot;,&quot;MISSING PERSON&quot;,&quot;SECONDARY CODES&quot;,&quot;SEX OFFENSES FORCIBLE&quot;,&quot;SEX OFFENSES NON FORCIBLE&quot;,&quot;SUSPICIOUS OCC&quot;))
+cat_prop &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;STOLEN PROPERTY&quot;,&quot;ROBBERY&quot;,&quot;LARCENY/THEFT&quot;))
+cat_nui &lt;- dat_crimefinal %&gt;% filter(Category %in% c(&quot;DISORDERLY CONDUCT&quot;,&quot;DRUG/NARCOTIC&quot;,&quot;DRUNKENNESS&quot;,&quot;NON-CRIMINAL&quot;,&quot;&quot;))</code></pre>
 
 
 </div>
