@@ -1,0 +1,53 @@
+---
+title: "Heat Map"
+author: "Payal Mehta"
+date: "April 26, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r heatmap}
+library(ggmap)
+x <- dat_crimefinal$X
+y <- dat_crimefinal$Y
+
+map_SF <- get_map(location = "San Francisco", zoom = 13)
+map <- ggmap(map_SF)
+
+
+#https://rpubs.com/nickbearman/r-google-map-making
+#plot the roads Google Maps basemap
+#map <- qmap('San Francisco', zoom = 15, maptype = 'roadmap')
+#plot the density map
+#map + stat_density2d(aes(x = x, y = y, fill = ..level.., alpha = ..level..), data = dat_crimefinal, geom = "polygon") + scale_fill_gradient(low = "blue", high = "red")
+
+#http://www.r-bloggers.com/contour-and-density-layers-with-ggmap/
+
+W <- dat_crimefinal
+ggmap(map_SF, extent = "panel", maprange=FALSE) +
+   geom_density2d(data = W, aes(x = x, y = y)) +
+   stat_density2d(data = W, aes(x = x, y = y,  fill = ..level.., alpha = ..level..),
+                  size = 0.01, bins = 16, geom = 'polygon') +
+   scale_fill_gradient(low = "blue", high = "red") +
+   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
+   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
