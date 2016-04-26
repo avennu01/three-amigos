@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="which route would three-amigos choose ?" class="anchor" href="#which route would three-amigos choose ?" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>which route would three-amigos choose ?</h1>
+<a id="which route would three-amigos choose ? - in progress" class="anchor" href="#which route would three-amigos choose ?  - in progress" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>which route would three-amigos choose ? - in progress</h1>
 
 <h1>
 <a id="background-and-motivation" class="anchor" href="#background-and-motivation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Background and Motivation</strong>:</h1>
@@ -51,13 +51,15 @@
 <a id="analysis" class="anchor" href="#analysis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Analysis</strong>:</h1>
 
  <ul>
- <li>Data Wrangling : <p> <h3> We started working with the SFO Crime train dataset readily available, initial challenge was to 
+ <li>Data Wrangling : <p> We started working with the SFO Crime train dataset readily available, initial challenge was to 
   identify the categories which are related to our end objective. Provided dataset had multiple categories labled as "Category"
   and each category was further subdivided in to multiple sub-categories here labled as "Descript" based on the act commited.
   There were few "Category"s and their "Descript"s which were outright not relevent to our cause and hence were filtered out 
-  to mention few "BAD CHECKS", "GAMBLING" etc., </h3>  </p>
+  to mention few "BAD CHECKS", "GAMBLING" etc., </p>
    <p>Our second phase of wrangling,was to closely examine "Descript"s and to filter out any non-relevant descriptions from 
-   with in our "Category". 
+  Category, for example "ASSAULT" category though is relevant to our case, act's such as "inflict injury on cohabitee",
+  "threatening phone calls","battery during labour dispute" and similar others are not relevant to a person whose 
+  mode of tranportation is WALKING from point A to point B. 
  </p> </li>
  <li>Proximity Algorithm</li> 
  <li>Visualization</li>
