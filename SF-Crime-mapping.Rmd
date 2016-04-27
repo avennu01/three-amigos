@@ -106,10 +106,18 @@ ggmap(map_SF_1) +
 
 
 ```{r first walking path + crime}
-
+#install.packages("fields")
+library("fields")
 walking_route_1
 
+##Count the number of route steps
+###Take off a count 
+walking_route_1_hop_count <- nrow(walking_route_1) - 1
+
 #Trying to find crime nearby
+
+
+##OLD Approach::
 dat_crime_route_1 <- dat_crime %>% filter(Y <= (walking_route_1$lat[1] + 0.0001),Y >= (walking_route_1$lat[1] - 0.0001),X <= (walking_route_1$lon[1] - 0.001), X >= -122.408)
 
 #dat_crime_route_1 %>% select(X, Y)
@@ -126,5 +134,8 @@ ggmap(map_SF_1) +
 # Create two additional walking 
 # Determine geo distance as it relates to lat/lon
 ```
+
+
+
 
 
