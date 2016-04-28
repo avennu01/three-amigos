@@ -32,6 +32,7 @@ map <- ggmap(map_SF)
 
 #http://www.r-bloggers.com/contour-and-density-layers-with-ggmap/
 
+#Heat map using all data across all categories
 W <- dat_crimefinal
 ggmap(map_SF, extent = "panel", maprange=FALSE) +
    geom_density2d(data = W, aes(x = x, y = y)) +
@@ -40,6 +41,63 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    scale_fill_gradient(low = "blue", high = "red") +
    scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
    theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+
+#Heat map across category deemed as property
+x1 <- cat_prop$X
+y1 <- cat_prop$Y
+
+ggmap(map_SF, extent = "panel", maprange=FALSE) +
+   geom_density2d(data = cat_prop, aes(x = x1, y = y1)) +
+   stat_density2d(data = cat_prop, aes(x = x1, y = y1,  fill = ..level.., alpha = ..level..),
+                  size = 0.01, bins = 16, geom = 'polygon') +
+   scale_fill_gradient(low = "green", high = "black") +
+   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
+   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+
+#Heat map across category deemed as life
+x2 <- cat_life$X
+y2 <- cat_life$Y
+
+ggmap(map_SF, extent = "panel", maprange=FALSE) +
+   geom_density2d(data = cat_life, aes(x = x2, y = y2)) +
+   stat_density2d(data = cat_life, aes(x = x2, y = y2,  fill = ..level.., alpha = ..level..),
+                  size = 0.01, bins = 16, geom = 'polygon') +
+   scale_fill_gradient(low = "yellow", high = "blue") +
+   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
+   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+
+#Heat map across category deemed as nuisance
+x3 <- cat_nui$X
+y3 <- cat_nui$Y
+
+ggmap(map_SF, extent = "panel", maprange=FALSE) +
+   geom_density2d(data = cat_nui, aes(x = x3, y = y3)) +
+   stat_density2d(data = cat_nui, aes(x = x3, y = y3,  fill = ..level.., alpha = ..level..),
+                  size = 0.01, bins = 16, geom = 'polygon') +
+   scale_fill_gradient(low = "yellow", high = "red") +
+   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
+   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+
+
+#Scatter plots
+#https://rpubs.com/hegupta/151080
+
+dat <- dat_crimefinal %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
+
+dat1 <- dat %>% group_by(Category) %>% summarize(occurence = n())
+#Histogram by Category
+qplot(Category, data = dat, geom = "bar", fill = Category) +
+    scale_x_discrete(breaks = NULL) +
+    ggtitle("Crime Categories in San Francisco") +
+    xlab("Category") + 
+    ylab("Occurence")
+
+qplot(PdDistrict, data = dat, geom = "bar", fill = class) +
+    scale_x_discrete(labels = PdDistrict) +
+    ggtitle("Crime by district and class in San Francisco") +
+    xlab("District") + 
+    ylab("Crimes by class")
+
 ```
 
 ## Including Plots
