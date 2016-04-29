@@ -126,14 +126,14 @@ route_1_mNorth <- max(walking_route_1$lat)
 ##Find the Max East
 route_1_mEast <- max(walking_route_1$lon)
 ##Find the Max South
-route_1_mSouth <- min(walking_route_1$lat[1:(walking_route_1_hop_count -1)])
+route_1_mSouth <- min(walking_route_1$lat[1:(walking_route_1_hop_count)])
 ##Find the Max West
 route_1_mWest <- min(walking_route_1$lon)
 #dat_crime_route_1 %>% select(X, Y)
 
 #dat_crime_route_1 <- dat_crime %>% filter(Y >= (route_1_mNorth + 0.0001),Y <= (route_1_mSouth - 0.0001), X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
 
-dat_crime_route_1 <- dat_crime %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+dat_crime_route_1 <- dat_crime %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.0001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
 
 ##This just renders the crime within the lat/lon constraints of how the map was centered
 ggmap(map_SF_1)  + 
