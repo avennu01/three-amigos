@@ -92,8 +92,8 @@ qplot(Category, data = dat, geom = "bar", fill = Category) +
     xlab("Category") + 
     ylab("Occurence")
 
-qplot(PdDistrict, data = dat, geom = "bar", fill = class) +
-    scale_x_discrete(labels = PdDistrict) +
+qplot(dat$PdDistrict, data = dat, geom = "bar", fill = class) +
+    scale_x_discrete(labels = dat$PdDistrict) +
     ggtitle("Crime by district and class in San Francisco") +
     xlab("District") + 
     ylab("Crimes by class")
