@@ -118,16 +118,29 @@ walking_route_1_hop_count <- nrow(walking_route_1) - 1
 
 
 ##OLD Approach::
-dat_crime_route_1 <- dat_crime %>% filter(Y <= (walking_route_1$lat[1] + 0.0001),Y >= (walking_route_1$lat[1] - 0.0001),X <= (walking_route_1$lon[1] - 0.001), X >= -122.408)
+#dat_crime_route_1 <- dat_crime %>% filter(Y <= (walking_route_1$lat[1] + 0.0001),Y >= (walking_route_1$lat[1] - 0.0001),X <= (walking_route_1$lon[1] - 0.001), X >= -122.408)
 
+##Find the Max North
+route_1_mNorth <- max(walking_route_1$lat)
+#route_1_mNorth
+##Find the Max East
+route_1_mEast <- max(walking_route_1$lon)
+##Find the Max South
+route_1_mSouth <- min(walking_route_1$lat[1:(walking_route_1_hop_count -1)])
+##Find the Max West
+route_1_mWest <- min(walking_route_1$lon)
 #dat_crime_route_1 %>% select(X, Y)
 
+#dat_crime_route_1 <- dat_crime %>% filter(Y >= (route_1_mNorth + 0.0001),Y <= (route_1_mSouth - 0.0001), X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+
+dat_crime_route_1 <- dat_crime %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+
 ##This just renders the crime within the lat/lon constraints of how the map was centered
-ggmap(map_SF_1) + 
+ggmap(map_SF_1)  + 
+  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.3, size=3, color="red") + 
     geom_path(data = walking_route_1,
         aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
-    ) + 
-  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=1, size=3, color="red") 
+    )
 
 ###TO DO
 # Additional line segments
