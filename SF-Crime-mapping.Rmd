@@ -22,9 +22,61 @@ library("repmis")
 ```
 
 ##Load the data from the Data Wrangling RMD
-```{r, code=readLines("SF-Crime-Project.Rmd"), echo=FALSE}
-#http://zevross.com/blog/2014/07/09/making-use-of-external-r-code-in-knitr-and-r-markdown/
+```{r, data_wrangling, echo=FALSE}
 
+library("dplyr")
+library("tidyr")
+library("readr")
+
+## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub
+
+dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
+
+table(dat_crime$Category)
+
+# seperating Dates in to Date & Time and selecting below categories only, rest have been eliminated based on group consensus since they dint have impact on our end objective
+
+# Missing Person .. Need more deepdive 
+
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
+
+dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+# Based of above table, below considerations have been made 
+# Descripts to consider apart from one's selected .... ASSAULT, BATTERY,STALKING,LOITERING,
+# complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE"
+# complete categories to ingore "VANDALISM","VEHICLE THEFT"
+
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC"))
+
+dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+p <- dat_occ %>% spread(Descript,occurence)
+
+final_desc <- c("AGGRAVATED ASSAULT WITH","ASSAULT, AGGRAVATED, W/","ATTEMPTED HOMICIDE WITH","ATTEMPTED MAYHEM WITH","ATTEMPTED SIMPLE","BATTERY WITH","MAYHEM WITH","THREATS AGAINST","WILLFUL CRUELTY","COMMITTING PUBLIC","DISTURBING THE PEAC","MAINTAINING A PUBLIC","FOR SALE","SALE OF","UNDER INFLUENCE","UNDER THE INFLUENCE","ATTEMPTED PETTY THEFT","GRAND THEFT PICK","GRAND THEFT PURSE","PETTY THEFT","THEFT, DRUNK ROLL,","AIDED CASE, DOG","AIDED CASE, INJURED","ASSAULT TO ROB WITH ","ATTEMPTED ROBBERY ON THE STREET","ATTEMPTED ROBBERY WITH","ROBBERY ON THE STREET ","ROBBERY, ARMED WITH A ","ROBBERY, BODILY","ASSAULT BY JUVENILE","SHOOTING BY JUVENILE","ANNOY OR MOLEST","STOLEN CELLULAR PHONE","STOLEN ELECTRONICS","SUSPICIOUS A","SUSPICIOUS OCCU","SUSPICIOUS PER","MISSING")
+
+select_desc <- function(x) { 
+                   names(p %>% select(contains(x)))[-1]
+      }
+
+dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(final_desc,select_desc))),dat_crimeNew %>% filter(Category %in% c("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE")))
+
+# Reduction in observations
+dim(dat_crime)
+dim(dat_crimeNew)
+dim(dat_crimefinal)
+
+# Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
+dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+cat_life <- dat_crimefinal %>% filter(Category %in% c("ASSAULT","KIDNAPPING","MISSING PERSON","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","SUSPICIOUS OCC"))
+cat_prop <- dat_crimefinal %>% filter(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"))
+cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"))
+
+
+
+##My attempt to load the external RMD
+#http://zevross.com/blog/2014/07/09/making-use-of-external-r-code-in-knitr-and-r-markdown/
 ```
 
 
@@ -33,7 +85,7 @@ library("repmis")
   #getwd() ##Get the present directory, where the data file should reside
     #dat_crime <- read_csv(unzip("train.csv.zip")) 
 ##Michael: Since GitHub has an issue storing large files and each time you call 'unzip', it places the large file in the folder.  So I loaded the file into a DropBox folder for sharing
-dat_crime <- read_csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
+#dat_crime <- read_csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
 
 
   #table(dat_crime$Category)
@@ -54,6 +106,16 @@ dat_crime <- read_csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1
 
 ```
 
+```{r, wrangling_clean_up}
+rm(dat_crime)
+rm(dat_crimeNew)
+rm(dat_occ)
+
+dat_crime <- dat_crimefinal
+
+```
+
+
 ```{r plain ggmap}
 
 ##
@@ -68,38 +130,45 @@ ggmap(map_SF)
 
 
 ```{r ggmap plus points}
-## install.packages("rgbif") ##For insatl
-#library("rgbif")  #Decided that this is not useful, but leaving here for now
-##
-map_SF <- get_map(location = "San Francisco", zoom = 13)
-
-##Warning, this one looks like a mess
+  ##Zoomed map of the wrangled crime points for the southern district area
+map_SF <- get_map(location = "The St. Regis San Francisco, San Francisco, CA", zoom = 15)
+  ##Warning, this one looks like a mess
 ggmap(map_SF) +
     geom_jitter(data = dat_crime, aes(X, Y), alpha=0.2, size=0.5, color="red") 
-
-
-
-##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
+  ##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
 ```
 
-```{r first walking path}
+```{r, find walking paths}
 
-walking_from_1 <- "1 Telegraph Hill Blvd, San Francisco, CA 94133" #Colt Tower
-walking_to_1 <- "1201 Mason St, San Francisco, CA 94108"  #Cable Car museum
-walking_route_1 <- route(walking_from_1, walking_to_1, structure = 'route', mode = 'walking', alternative = FALSE)
+##2 mile walk # North bound
+walking_from_1 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
+  walking_to_1 <- "Pier 41, San Francisco, CA 94108"  #Cable Car museum
+  walking_route_1 <- route(walking_from_1, walking_to_1, structure = 'route', 
+                           mode = 'walking', alternative = FALSE)
+##2 mile walk # West bound
+walking_from_2 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
+  walking_to_2 <- "Painted Ladies, Steiner Street, San Francisco, CA 94117"  #Painted Ladies
+  walking_route_2 <- route(walking_from_2, walking_to_2, structure = 'route', 
+                           mode = 'walking', alternative = FALSE)
+##~1 mile walk # East bound
+walking_from_3 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
+  walking_to_3 <- "369 The Embarcadero, San Francisco, CA 94105"  #Cupid's Span
+  walking_route_3 <- route(walking_from_3, walking_to_3, structure = 'route', 
+                           mode = 'walking', alternative = FALSE)
 
-##Need to figure out how to auto-focus the map
-map_SF_1 <- get_map(location = "Washington Square Park, San Francisco, CA 94133", zoom = 16)
+  ##Need to figure out how to auto-focus the map
+map_SF_1 <- get_map(location = "125 3rd Street, San Francisco, CA 94103", zoom = 14)
 
 
 ggmap(map_SF_1) + 
     geom_path(data = walking_route_1,
-        aes(x = lon, y = lat), color="red", size = 1.5, lineend='round'
+        aes(x = lon, y = lat), color="purple", size = 1.5, lineend='round') + 
+    geom_path(data = walking_route_2,
+        aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
+    ) + 
+    geom_path(data = walking_route_3,
+        aes(x = lon, y = lat), color="orange", size = 1.5, lineend='round'
     )
-
-
-
-
 #https://rpubs.com/nickbearman/r-google-map-making
 #https://www.google.com/maps/dir/Coit+Tower,+1+Telegraph+Hill+Blvd,+San+Francisco,+CA+94133/Cable+Car+Museum,+Mason+Street,+San+Francisco,+CA/@37.7991066,-122.4139408,16z/data=!3m1!4b1!4m13!4m12!1m5!1m1!1s0x8085808c40000001:0xde85b80121f2dd44!2m2!1d-122.4058222!2d37.8023949!1m5!1m1!1s0x808580f2960c5a5f:0xdfcd6cebc1ae9a35!2m2!1d-122.411488!2d37.7946268
 ```
@@ -108,47 +177,59 @@ ggmap(map_SF_1) +
 ```{r first walking path + crime}
 #install.packages("fields")
 library("fields")
-walking_route_1
+#walking_route_1
 
 ##Count the number of route steps
 ###Take off a count 
 walking_route_1_hop_count <- nrow(walking_route_1) - 1
-
+walking_route_2_hop_count <- nrow(walking_route_2) - 1
+walking_route_3_hop_count <- nrow(walking_route_3) - 1
 #Trying to find crime nearby
 
 
 ##OLD Approach::
 #dat_crime_route_1 <- dat_crime %>% filter(Y <= (walking_route_1$lat[1] + 0.0001),Y >= (walking_route_1$lat[1] - 0.0001),X <= (walking_route_1$lon[1] - 0.001), X >= -122.408)
 
-##Find the Max North
-route_1_mNorth <- max(walking_route_1$lat)
-#route_1_mNorth
-##Find the Max East
+  ##Find the Max North
+route_1_mNorth <- max(walking_route_1$lat[1:(walking_route_1_hop_count)])
+route_2_mNorth <- max(walking_route_2$lat)
+route_3_mNorth <- max(walking_route_3$lat)
+  ##Find the Max East
 route_1_mEast <- max(walking_route_1$lon)
-##Find the Max South
+route_2_mEast <- max(walking_route_2$lon)
+route_3_mEast <- max(walking_route_3$lon)
+  ##Find the Max South
 route_1_mSouth <- min(walking_route_1$lat[1:(walking_route_1_hop_count)])
-##Find the Max West
+route_2_mSouth <- min(walking_route_2$lat[1:(walking_route_2_hop_count)])
+route_3_mSouth <- min(walking_route_3$lat[1:(walking_route_3_hop_count)])
+  ##Find the Max West
 route_1_mWest <- min(walking_route_1$lon)
-#dat_crime_route_1 %>% select(X, Y)
-
-#dat_crime_route_1 <- dat_crime %>% filter(Y >= (route_1_mNorth + 0.0001),Y <= (route_1_mSouth - 0.0001), X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+route_2_mWest <- min(walking_route_2$lon[1:(walking_route_2_hop_count)])
+route_3_mWest <- min(walking_route_3$lon)
 
 dat_crime_route_1 <- dat_crime %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.0001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+  #nrow(dat_crime_route_1)
+dat_crime_route_2 <- dat_crime %>% filter(Y <= (route_2_mNorth + 0.0001),Y >= (route_2_mSouth - 0.0001),X >= (route_2_mWest - 0.001), X <= (route_2_mEast + 0.001))
+  #nrow(dat_crime_route_2)
+dat_crime_route_3 <- dat_crime %>% filter(Y <= (route_3_mNorth + 0.0001),Y >= (route_3_mSouth - 0.0001),X >= (route_3_mWest - 0.001), X <= (route_3_mEast + 0.001))
+  #nrow(dat_crime_route_3)
 
 ##This just renders the crime within the lat/lon constraints of how the map was centered
 ggmap(map_SF_1)  + 
-  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.3, size=3, color="red") + 
+  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.3, size=1, color="purple") +
+  geom_jitter(data = dat_crime_route_2, aes(X, Y), alpha=0.3, size=1, color="blue") +
+  geom_jitter(data = dat_crime_route_3, aes(X, Y), alpha=0.3, size=1, color="orange") +
     geom_path(data = walking_route_1,
-        aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
-    )
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  geom_path(data = walking_route_2,
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  geom_path(data = walking_route_3,
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') 
+
 
 ###TO DO
-# Additional line segments
-# Create two additional walking 
-# Determine geo distance as it relates to lat/lon
+# Calculate crime risk for walking segment 3 to be double, since round trip
+
 ```
-
-
-
 
 
