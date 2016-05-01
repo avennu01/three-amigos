@@ -184,6 +184,8 @@ walking_route_1_hop_count <- nrow(walking_route_1) - 1
 walking_route_2_hop_count <- nrow(walking_route_2) - 1
 walking_route_3_hop_count <- nrow(walking_route_3) - 1
 
+walking_route_1_end <- walking_route_1[walking_route_1_hop_count]
+
   ##Find the Max North
 route_1_mNorth <- max(walking_route_1$lat[1:(walking_route_1_hop_count)])
 route_2_mNorth <- max(walking_route_2$lat)
@@ -211,18 +213,45 @@ dat_crime_route_3 <- dat_crime %>% filter(Y <= (route_3_mNorth + 0.0001),Y >= (r
 
 ##This just renders the crime within the lat/lon constraints of how the map was centered
 ggmap(map_SF_1)  + 
+
+      ## Start with mapping the in-scope crime data points
   geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.3, size=1, color="purple") +
   geom_jitter(data = dat_crime_route_2, aes(X, Y), alpha=0.3, size=1, color="blue") +
   geom_jitter(data = dat_crime_route_3, aes(X, Y), alpha=0.3, size=1, color="orange") +
-    geom_path(data = walking_route_1,
+
+      ##Add in x and y axis labels
+  xlab("Longitude")+ylab("Latitude") +
+  
+    ## Next, lay out the walking paths for the three routes.
+  geom_path(data = walking_route_1,
         aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
   geom_path(data = walking_route_2,
         aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
   geom_path(data = walking_route_3,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') 
-
-
-
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  
+    ##Dot & label for Starting Point
+  geom_point(data=walking_route_1[1,],  color="white", size=6) +
+  geom_label(data=walking_route_1[1,], label="St. Regis", hjust=1.2, vjust=-0.5, size=5 ) +
+  
+    ##Dots & labels for ending points
+  geom_point(data=walking_route_1[walking_route_1_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_1[walking_route_1_hop_count,], label="Aquarium of the Bay", vjust=-1, size=5)+
+  geom_point(data=walking_route_2[walking_route_2_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=2, size=5)+
+  geom_point(data=walking_route_3[walking_route_3_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5)
 ```
 
+```{r, three path statistics}
+  ##
+dat_crime_route_1 <- dat_crime_route_1 %>% mutate(path = 1)
+dat_crime_route_2 <- dat_crime_route_2 %>% mutate(path = 2)
+dat_crime_route_3 <- dat_crime_route_3 %>% mutate(path = 3)
+data_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
+  #nrow(data_crime_routes)
+  rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
+  #head(data_crime_routes)
+  #three_path <- c("Destination", "Length_Actual", "Neighborhood_Crime_Count"")
 
+```
