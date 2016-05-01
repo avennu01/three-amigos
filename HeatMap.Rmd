@@ -20,7 +20,7 @@ library(ggmap)
 x <- dat_crimefinal$X
 y <- dat_crimefinal$Y
 
-map_SF <- get_map(location = "San Francisco", zoom = 13)
+map_SF <- get_map(location = "San Francisco", zoom = 12)
 map <- ggmap(map_SF)
 
 
@@ -39,8 +39,7 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    stat_density2d(data = W, aes(x = x, y = y,  fill = ..level.., alpha = ..level..),
                   size = 0.01, bins = 16, geom = 'polygon') +
    scale_fill_gradient(low = "blue", high = "red") +
-   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
-   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+   theme(legend.position = "none")
 
 #Heat map across category deemed as property
 x1 <- cat_prop$X
@@ -51,8 +50,7 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    stat_density2d(data = cat_prop, aes(x = x1, y = y1,  fill = ..level.., alpha = ..level..),
                   size = 0.01, bins = 16, geom = 'polygon') +
    scale_fill_gradient(low = "green", high = "black") +
-   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
-   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+   theme(legend.position = "none")
 
 #Heat map across category deemed as life
 x2 <- cat_life$X
@@ -63,8 +61,7 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    stat_density2d(data = cat_life, aes(x = x2, y = y2,  fill = ..level.., alpha = ..level..),
                   size = 0.01, bins = 16, geom = 'polygon') +
    scale_fill_gradient(low = "yellow", high = "blue") +
-   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
-   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+   theme(legend.position = "none")
 
 #Heat map across category deemed as nuisance
 x3 <- cat_nui$X
@@ -75,8 +72,7 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    stat_density2d(data = cat_nui, aes(x = x3, y = y3,  fill = ..level.., alpha = ..level..),
                   size = 0.01, bins = 16, geom = 'polygon') +
    scale_fill_gradient(low = "yellow", high = "red") +
-   scale_alpha(range = c(0.00, 0.25), guide = FALSE) +
-   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))
+   theme(legend.position = "none")
 
 
 #Scatter plots
@@ -87,7 +83,6 @@ dat <- dat_crimefinal %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY
 dat1 <- dat %>% group_by(Category) %>% summarize(occurence = n())
 #Histogram by Category
 qplot(Category, data = dat, geom = "bar", fill = Category) +
-    scale_x_discrete(breaks = NULL) +
     ggtitle("Crime Categories in San Francisco") +
     xlab("Category") + 
     ylab("Occurence")
