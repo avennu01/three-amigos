@@ -98,6 +98,28 @@ qplot(dat$PdDistrict, data = dat, geom = "bar", fill = class) +
     xlab("District") + 
     ylab("Crimes by class")
 
+#Further analysis of Southern District
+
+#Daily average crime by class in southern district
+dat2 <- dat %>% filter(PdDistrict == "SOUTHERN") %>% group_by(DayOfWeek, class) %>% summarize(DailyAvg = mean(n()))
+
+ggplot(dat2, aes(x = dat2$DayOfWeek, y = dat2$DailyAvg, fill = factor(dat2$class) )) + geom_bar(stat="identity") + labs(x = "Day of Week", y = "Daily Average", title = "Daily Avg Crime by class for Southern District")
+
+
+#Time of Day analysis for Southern District
+dat3 <- dat %>% filter(PdDistrict=="SOUTHERN")
+
+time <- as.data.frame(table(dat3$Time),stringsAsFactors = FALSE)
+time$Hour <- substr(time$Var1, 1, 2)
+TimeOfDay <- ggplot(crime_time, aes(x = Hour, Freq))
+TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
+    labs(x = "Time of Day", y = "Occurrences", title ="Southern District crime timings") 
+  
+
+
+
+
+
 ```
 
 ## Including Plots
