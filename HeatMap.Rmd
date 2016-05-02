@@ -15,6 +15,62 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
+
+```{r, data_wrangling}
+
+library("dplyr")
+library("tidyr")
+library("readr")
+
+## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub
+
+dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
+
+table(dat_crime$Category)
+
+# seperating Dates in to Date & Time and selecting below categories only, rest have been eliminated based on group consensus since they dint have impact on our end objective
+
+# Missing Person .. Need more deepdive 
+
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
+
+dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+# Based of above table, below considerations have been made 
+# Descripts to consider apart from one's selected .... ASSAULT, BATTERY,STALKING,LOITERING,
+# complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE"
+# complete categories to ingore "VANDALISM","VEHICLE THEFT"
+
+dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC"))
+
+dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+p <- dat_occ %>% spread(Descript,occurence)
+
+final_desc <- c("AGGRAVATED ASSAULT WITH","ASSAULT, AGGRAVATED, W/","ATTEMPTED HOMICIDE WITH","ATTEMPTED MAYHEM WITH","ATTEMPTED SIMPLE","BATTERY WITH","MAYHEM WITH","THREATS AGAINST","WILLFUL CRUELTY","COMMITTING PUBLIC","DISTURBING THE PEAC","MAINTAINING A PUBLIC","FOR SALE","SALE OF","UNDER INFLUENCE","UNDER THE INFLUENCE","ATTEMPTED PETTY THEFT","GRAND THEFT PICK","GRAND THEFT PURSE","PETTY THEFT","THEFT, DRUNK ROLL,","AIDED CASE, DOG","AIDED CASE, INJURED","ASSAULT TO ROB WITH ","ATTEMPTED ROBBERY ON THE STREET","ATTEMPTED ROBBERY WITH","ROBBERY ON THE STREET ","ROBBERY, ARMED WITH A ","ROBBERY, BODILY","ASSAULT BY JUVENILE","SHOOTING BY JUVENILE","ANNOY OR MOLEST","STOLEN CELLULAR PHONE","STOLEN ELECTRONICS","SUSPICIOUS A","SUSPICIOUS OCCU","SUSPICIOUS PER","MISSING")
+
+select_desc <- function(x) { 
+                   names(p %>% select(contains(x)))[-1]
+      }
+
+dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(final_desc,select_desc))),dat_crimeNew %>% filter(Category %in% c("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE")))
+
+# Reduction in observations
+dim(dat_crime)
+dim(dat_crimeNew)
+dim(dat_crimefinal)
+
+# Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
+dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+cat_life <- dat_crimefinal %>% filter(Category %in% c("ASSAULT","KIDNAPPING","MISSING PERSON","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","SUSPICIOUS OCC"))
+cat_prop <- dat_crimefinal %>% filter(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"))
+cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"))
+
+```
+
+
+
 ```{r heatmap}
 library(ggmap)
 x <- dat_crimefinal$X
@@ -88,7 +144,7 @@ qplot(Category, data = dat, geom = "bar", fill = Category) +
     ylab("Occurence")
 
 qplot(dat$PdDistrict, data = dat, geom = "bar", fill = class) +
-    scale_x_discrete(labels = dat$PdDistrict) +
+    scale_x_discrete(label = abbreviate) +
     ggtitle("Crime by district and class in San Francisco") +
     xlab("District") + 
     ylab("Crimes by class")
@@ -106,7 +162,7 @@ dat3 <- dat %>% filter(PdDistrict=="SOUTHERN")
 
 time <- as.data.frame(table(dat3$Time),stringsAsFactors = FALSE)
 time$Hour <- substr(time$Var1, 1, 2)
-TimeOfDay <- ggplot(crime_time, aes(x = Hour, Freq))
+TimeOfDay <- ggplot(time, aes(x = Hour, Freq))
 TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
     labs(x = "Time of Day", y = "Occurrences", title ="Southern District crime timings") 
   
@@ -117,12 +173,3 @@ TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
 
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
