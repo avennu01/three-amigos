@@ -244,14 +244,49 @@ ggmap(map_SF_1)  +
 ```
 
 ```{r, three path statistics}
-  ##
+  ##Combine all three individual routes into a single data fram
 dat_crime_route_1 <- dat_crime_route_1 %>% mutate(path = 1)
 dat_crime_route_2 <- dat_crime_route_2 %>% mutate(path = 2)
 dat_crime_route_3 <- dat_crime_route_3 %>% mutate(path = 3)
-data_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
-  #nrow(data_crime_routes)
-  rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
-  #head(data_crime_routes)
-  #three_path <- c("Destination", "Length_Actual", "Neighborhood_Crime_Count"")
+dat_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
+  ## Clean-up variables no longer required
+#rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
+
+W <- dat_crime_route_1
+ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
+      ##Create heatmap for neighborhood #1
+   geom_density2d(data = W, aes(x = X, y = Y)) +
+   stat_density2d(data = W, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
+                  size = 0.01, geom = 'polygon') + #, bins = 16
+   scale_fill_gradient(low = "blue", high = "red") +
+   scale_alpha(range = c(0.00, 0.75), guide = FALSE) +
+   theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))+
+##Create heatmap for neighborhood #2
+  geom_density2d(data = dat_crime_route_2, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crime_route_2, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
+##Create heatmap for neighborhood #3
+  geom_density2d(data = dat_crime_route_3, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crime_route_3, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
+  
+      ## Next, lay out the walking paths for the three routes.
+  geom_path(data = walking_route_1,
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  geom_path(data = walking_route_2,
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  geom_path(data = walking_route_3,
+        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+  
+    ##Dot & label for Starting Point
+  geom_point(data=walking_route_1[1,],  color="white", size=6) +
+  geom_label(data=walking_route_1[1,], label="St. Regis", hjust=0.2, vjust=2.0, size=5 ) +
+  
+    ##Dots & labels for ending points
+  geom_point(data=walking_route_1[walking_route_1_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_1[walking_route_1_hop_count,], label="Aquarium of the Bay", vjust=-1, size=5)+
+  geom_point(data=walking_route_2[walking_route_2_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=2, size=5)+
+  geom_point(data=walking_route_3[walking_route_3_hop_count,],  color="yellow", size=4) +
+    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5)
+
 
 ```
