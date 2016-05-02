@@ -5,7 +5,7 @@ date: "April 21, 2016"
 output: html_document
 ---
 
-```{r, setup, include=FALSE}
+```{r, setup, echo=FALSE, message=FALSE, warning=FALSE}
 rm(list=ls()) ##Clear workingspace
 
 library("dplyr")
@@ -21,8 +21,8 @@ library("ggplot2")
 library("repmis")
 ```
 
-##Load the data from the Data Wrangling RMD
-```{r, data_wrangling, echo=FALSE}
+##Load and wrangle the data
+```{r, data_wrangling, echo=FALSE, message=FALSE, warning=FALSE}
 
 library("dplyr")
 library("tidyr")
@@ -32,7 +32,7 @@ library("readr")
 
 dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
 
-table(dat_crime$Category)
+#table(dat_crime$Category)
 
 # seperating Dates in to Date & Time and selecting below categories only, rest have been eliminated based on group consensus since they dint have impact on our end objective
 
@@ -62,9 +62,12 @@ select_desc <- function(x) {
 dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(final_desc,select_desc))),dat_crimeNew %>% filter(Category %in% c("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE")))
 
 # Reduction in observations
-dim(dat_crime)
-dim(dat_crimeNew)
-dim(dat_crimefinal)
+#dim(dat_crime)
+#dim(dat_crimeNew)
+#dim(dat_crimefinal)
+paste("Original raw data set was ", nrow(dat_crime), " observances.")
+paste("Original raw data set was BLA BLA", nrow(dat_crimeNew), " observances.")
+paste("Lastly, all data not impacting a pedistrian was removed, leaving", nrow(dat_crimefinal), " observances.")
 
 # Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
 dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(occurence= n())
@@ -80,33 +83,7 @@ cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/
 ```
 
 
-##Load the data
-```{r loading data}
-  #getwd() ##Get the present directory, where the data file should reside
-    #dat_crime <- read_csv(unzip("train.csv.zip")) 
-##Michael: Since GitHub has an issue storing large files and each time you call 'unzip', it places the large file in the folder.  So I loaded the file into a DropBox folder for sharing
-#dat_crime <- read_csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
-
-
-  #table(dat_crime$Category)
-#dat_crime %>% plot(dat_crime, x = dat_crime$X, y = dat_crime$Y, type = "p")
-#plot(dat_crime$X, dat_crime$Y, type = "p")
-
-#x <- dat_crime$X ##Latitude
-#y <- dat_crime$Y ##Longitude
-#plot (x,y)
-#dat_crime %>% plot(.)
-
-
-
-##Using rworldmap package
-#rworld_map <- getMap(resolution = "low")
-#plot (rworld_map, xlim = c(-20, 59), ylim = c(35, 71), asp = 1)
-
-
-```
-
-```{r, wrangling_clean_up}
+```{r, wrangling_clean_up, echo=FALSE, message=FALSE}
 rm(dat_crime)
 rm(dat_crimeNew)
 rm(dat_occ)
@@ -115,8 +92,8 @@ dat_crime <- dat_crimefinal
 
 ```
 
-
-```{r plain ggmap}
+##Basic San Francisco map
+```{r plain ggmap, echo=FALSE, message=FALSE, warning=FALSE}
 
 ##
 map_SF <- get_map(location = "San Francisco", zoom = 13)
@@ -128,8 +105,8 @@ ggmap(map_SF)
 
 ```
 
-
-```{r ggmap plus points}
+##San Francisco map with all wrangled crime points
+```{r ggmap plus points, echo=FALSE, message=FALSE, warning=FALSE}
   ##Zoomed map of the wrangled crime points for the southern district area
 map_SF <- get_map(location = "The St. Regis San Francisco, San Francisco, CA", zoom = 15)
   ##Warning, this one looks like a mess
@@ -138,7 +115,8 @@ ggmap(map_SF) +
   ##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
 ```
 
-```{r, find walking paths}
+##The three choosen paths from our hotel at St. Regis
+```{r, find walking paths, echo=FALSE, message=FALSE, warning=FALSE}
 
 ##2 mile walk # North bound
 walking_from_1 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
@@ -173,8 +151,8 @@ ggmap(map_SF_1) +
 #https://www.google.com/maps/dir/Coit+Tower,+1+Telegraph+Hill+Blvd,+San+Francisco,+CA+94133/Cable+Car+Museum,+Mason+Street,+San+Francisco,+CA/@37.7991066,-122.4139408,16z/data=!3m1!4b1!4m13!4m12!1m5!1m1!1s0x8085808c40000001:0xde85b80121f2dd44!2m2!1d-122.4058222!2d37.8023949!1m5!1m1!1s0x808580f2960c5a5f:0xdfcd6cebc1ae9a35!2m2!1d-122.411488!2d37.7946268
 ```
 
-
-```{r first walking path + crime}
+##The three paths and their associated neighborhood crime
+```{r walking paths + crime points, echo=FALSE, message=FALSE, warning=FALSE}
 #install.packages("fields")
 library("fields")
 
@@ -238,12 +216,16 @@ ggmap(map_SF_1)  +
   geom_point(data=walking_route_1[walking_route_1_hop_count,],  color="yellow", size=4) +
     geom_label(data=walking_route_1[walking_route_1_hop_count,], label="Aquarium of the Bay", vjust=-1, size=5)+
   geom_point(data=walking_route_2[walking_route_2_hop_count,],  color="yellow", size=4) +
-    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=2, size=5)+
+    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=1.5, size=5)+
   geom_point(data=walking_route_3[walking_route_3_hop_count,],  color="yellow", size=4) +
-    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5)
+    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-0.5, size=5)
 ```
 
-```{r, three path statistics}
+```{r, three path statistics for path decision, echo=FALSE, message=FALSE, warning=FALSE}
+#dat_crime # All wrangled full data set
+#dat_crime_routes # Crime points within the choosen path's neighborhoods
+
+# Crime categories = life[*0.6], nuisance[(0.1], property[*0.3]
   ##Combine all three individual routes into a single data fram
 dat_crime_route_1 <- dat_crime_route_1 %>% mutate(path = 1)
 dat_crime_route_2 <- dat_crime_route_2 %>% mutate(path = 2)
@@ -252,11 +234,54 @@ dat_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_
   ## Clean-up variables no longer required
 #rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
 
+ dat_crime_routes <- dat_crime_routes %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
+
+#prop.table(table(dat_crime_routes %>% group_by(path, class)))
+
+#prop.table(table(filter(dat_crime_routes,path ==1)))
+
+#dat_crime_routes %>% group_by(path, class) %>% summarise(n())
+#dat_crime_routes %>% group_by(path, class)
+
+route_1_crime_ct_Life <- dat_crime_routes %>% filter(path ==1, class == "Life") %>% nrow() * 0.6
+route_1_crime_ct_Nui <- dat_crime_routes %>% filter(path ==1, class == "Nui") %>% nrow() * 0.3
+route_1_crime_ct_Prop <- dat_crime_routes %>% filter(path ==1, class == "Prop") %>% nrow() * 0.1
+route_1_crime_relative_risk <- route_1_crime_ct_Life + route_1_crime_ct_Nui + route_1_crime_ct_Prop
+
+route_2_crime_ct_Life <- dat_crime_routes %>% filter(path ==2, class == "Life") %>% nrow() * 0.6
+route_2_crime_ct_Nui <- dat_crime_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 0.3
+route_2_crime_ct_Prop <- dat_crime_routes %>% filter(path ==2, class == "Prop") %>% nrow() * 0.1
+route_2_crime_relative_risk <- route_2_crime_ct_Life + route_2_crime_ct_Nui + route_2_crime_ct_Prop
+
+route_3_crime_ct_Life <- dat_crime_routes %>% filter(path ==2, class == "Life") %>% nrow() * 2 *0.6
+route_3_crime_ct_Nui <- dat_crime_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 2* 0.3
+route_3_crime_ct_Prop <- dat_crime_routes %>% filter(path ==2, class == "Prop") %>% nrow() *2* 0.1
+route_3_crime_relative_risk <- route_3_crime_ct_Life + route_3_crime_ct_Nui + route_3_crime_ct_Prop
+
+#route_1_crime_relative_risk
+#route_2_crime_relative_risk
+#route_3_crime_relative_risk
+
+
+  ##Route risk ranking, 10 being worst risk
+  ##Make this dynamic in the map rendering
+route_risk_rank_1 <- c(1, round(route_1_crime_relative_risk/   max(route_1_crime_relative_risk,route_2_crime_relative_risk,route_3_crime_relative_risk) * 10))
+route_risk_rank_2 <- c(2, round(route_2_crime_relative_risk/ max(route_1_crime_relative_risk,route_2_crime_relative_risk,route_3_crime_relative_risk) * 10))
+route_risk_rank_3 <- c(3, round(route_3_crime_relative_risk / max(route_1_crime_relative_risk,route_2_crime_relative_risk,route_3_crime_relative_risk) * 10))
+route_risk_rank <- rbind(route_risk_rank_1, route_risk_rank_2, route_risk_rank_3)
+colnames(route_risk_rank) <- c("path", "risk_rank")
+
+```
+
+##Three paths and heat map of the in-scope crime points 
+```{r, three paths& heat map, echo=FALSE, message=FALSE, warning=FALSE}
+
+
 W <- dat_crime_route_1
 ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
       ##Create heatmap for neighborhood #1
-   geom_density2d(data = W, aes(x = X, y = Y)) +
-   stat_density2d(data = W, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
+   geom_density2d(data = dat_crime_route_1, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crime_route_1, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
                   size = 0.01, geom = 'polygon') + #, bins = 16
    scale_fill_gradient(low = "blue", high = "red") +
    scale_alpha(range = c(0.00, 0.75), guide = FALSE) +
@@ -270,11 +295,11 @@ ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
   
       ## Next, lay out the walking paths for the three routes.
   geom_path(data = walking_route_1,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="blue", size = 2.5, lineend='round') +
   geom_path(data = walking_route_2,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="orange", size = 1.5, lineend='round') +
   geom_path(data = walking_route_3,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="red", size = 1.5, lineend='round') +
   
     ##Dot & label for Starting Point
   geom_point(data=walking_route_1[1,],  color="white", size=6) +
@@ -284,9 +309,12 @@ ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
   geom_point(data=walking_route_1[walking_route_1_hop_count,],  color="yellow", size=4) +
     geom_label(data=walking_route_1[walking_route_1_hop_count,], label="Aquarium of the Bay", vjust=-1, size=5)+
   geom_point(data=walking_route_2[walking_route_2_hop_count,],  color="yellow", size=4) +
-    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=2, size=5)+
+    geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=1.5, size=5)+
   geom_point(data=walking_route_3[walking_route_3_hop_count,],  color="yellow", size=4) +
-    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5)
-
+    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5) +
+ ##Add in x and y axis labels
+  xlab("Longitude")+ylab("Latitude")
 
 ```
+
+
