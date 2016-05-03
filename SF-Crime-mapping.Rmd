@@ -95,23 +95,22 @@ dat_crime <- dat_crimefinal
 #Visualizations
 
 
-```{r, Visualizations, echo=FALSE, message=FALSE, warning=FALSE}
-
+```{r, Visualizations, message=FALSE, warning=FALSE}
+#loading library ggmap
 library(ggmap)
+
+#Assigning longitude and latitude to x and y
 x <- dat_crimefinal$X
 y <- dat_crimefinal$Y
 
+#Creating base map of San Francisco using ggmap
 map_SF <- get_map(location = "San Francisco", zoom = 12)
 map <- ggmap(map_SF)
 
-
+#Inspiration and ideas from the following sources
 #https://rpubs.com/nickbearman/r-google-map-making
-#plot the roads Google Maps basemap
-#map <- qmap('San Francisco', zoom = 15, maptype = 'roadmap')
-#plot the density map
-#map + stat_density2d(aes(x = x, y = y, fill = ..level.., alpha = ..level..), data = dat_crimefinal, geom = "polygon") + scale_fill_gradient(low = "blue", high = "red")
-
 #http://www.r-bloggers.com/contour-and-density-layers-with-ggmap/
+#https://rpubs.com/hegupta/151080
 
 #Heat map using all data across all categories
 W <- dat_crimefinal
@@ -155,13 +154,12 @@ ggmap(map_SF, extent = "panel", maprange=FALSE) +
    scale_fill_gradient(low = "yellow", high = "red") +
    theme(legend.position = "none")+ ggtitle("Category Nuisance Crimes")
 
-
-#Scatter plots
-#https://rpubs.com/hegupta/151080
+#Adding column "class" to dataset using nested if statement with mutate
 
 dat <- dat_crimefinal %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
 
 dat1 <- dat %>% group_by(Category) %>% summarize(occurence = n())
+
 #Histogram by Category
 qplot(Category, data = dat, geom = "bar", fill = Category) +
     ggtitle("Crime Categories in San Francisco") +
@@ -169,6 +167,7 @@ qplot(Category, data = dat, geom = "bar", fill = Category) +
     xlab("Category") + 
     ylab("Occurence")
 
+#Histogram by district
 qplot(dat$PdDistrict, data = dat, geom = "bar", fill = class) +
     scale_x_discrete(label = abbreviate) +
     ggtitle("Crime by district and class in San Francisco") +
@@ -191,21 +190,6 @@ time$Hour <- substr(time$Var1, 1, 2)
 TimeOfDay <- ggplot(time, aes(x = Hour, Freq))
 TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
     labs(x = "Time of Day", y = "Occurrences", title ="Southern District crime timings") 
-
-
-
-
-
-
-
-
-
-##Basic San Francisco map
-#map_SF <- get_map(location = "San Francisco", zoom = 13)
-#ggmap(map_SF)
-
-#Different views : http://www.r-bloggers.com/throw-some-throw-some-stats-on-that-mappart-1/
-
 
 ```
 
