@@ -201,8 +201,8 @@ TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
 
 
 ##Basic San Francisco map
-map_SF <- get_map(location = "San Francisco", zoom = 13)
-ggmap(map_SF)
+#map_SF <- get_map(location = "San Francisco", zoom = 13)
+#ggmap(map_SF)
 
 #Different views : http://www.r-bloggers.com/throw-some-throw-some-stats-on-that-mappart-1/
 
@@ -212,7 +212,7 @@ ggmap(map_SF)
 ##San Francisco map with all wrangled crime points
 ```{r ggmap plus points, echo=FALSE, message=FALSE, warning=FALSE}
   ##Zoomed map of the wrangled crime points for the southern district area
-map_SF <- get_map(location = "The St. Regis San Francisco, San Francisco, CA", zoom = 15)
+map_SF <- get_map(location = "San Francisco, CA", zoom = 13)
   ##Warning, this one looks like a mess
 ggmap(map_SF) +
     geom_jitter(data = dat_crime, aes(X, Y), alpha=0.2, size=0.5, color="red") 
@@ -244,12 +244,12 @@ map_SF_1 <- get_map(location = "500 California St, San Francisco, CA 94104", zoo
 
 ggmap(map_SF_1) + 
     geom_path(data = walking_route_1,
-        aes(x = lon, y = lat), color="purple", size = 1.5, lineend='round') + 
+        aes(x = lon, y = lat), color="brown", size = 1.5, lineend='round') + 
     geom_path(data = walking_route_2,
-        aes(x = lon, y = lat), color="blue", size = 1.5, lineend='round'
+        aes(x = lon, y = lat), color="gray", size = 1.5, lineend='round'
     ) + 
     geom_path(data = walking_route_3,
-        aes(x = lon, y = lat), color="orange", size = 1.5, lineend='round'
+        aes(x = lon, y = lat), color="tan", size = 1.5, lineend='round'
     )
 #https://rpubs.com/nickbearman/r-google-map-making
 #https://www.google.com/maps/dir/Coit+Tower,+1+Telegraph+Hill+Blvd,+San+Francisco,+CA+94133/Cable+Car+Museum,+Mason+Street,+San+Francisco,+CA/@37.7991066,-122.4139408,16z/data=!3m1!4b1!4m13!4m12!1m5!1m1!1s0x8085808c40000001:0xde85b80121f2dd44!2m2!1d-122.4058222!2d37.8023949!1m5!1m1!1s0x808580f2960c5a5f:0xdfcd6cebc1ae9a35!2m2!1d-122.411488!2d37.7946268
@@ -306,11 +306,11 @@ ggmap(map_SF_1)  +
   
     ## Next, lay out the walking paths for the three routes.
   geom_path(data = walking_route_1,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="brown", size = 1.5, lineend='round') +
   geom_path(data = walking_route_2,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="gray", size = 1.5, lineend='round') +
   geom_path(data = walking_route_3,
-        aes(x = lon, y = lat), color="black", size = 1.5, lineend='round') +
+        aes(x = lon, y = lat), color="tan", size = 1.5, lineend='round') +
   
     ##Dot & label for Starting Point
   geom_point(data=walking_route_1[1,],  color="white", size=6) +
