@@ -4,25 +4,25 @@ author: "Michael Woolfe, Payal Mehta, Abhilash Vennu"
 date: "May 3rd 2016"
 output: html_document
 ---
-
+## RMD environment requirements:
+  #rStudio 3.2.4
+  #Internet access to download DropBox hosted csv file [128MB]
+  #Folder 'sfzipcodes' located in RMD's working directory
+    #https://github.com/avennu01/three-amigos/tree/master/sfzipcodes
+    
 ```{r, setup, echo=FALSE, message=FALSE, warning=FALSE}
 rm(list=ls()) ##Clear workingspace
-
 library("dplyr")
 library("tidyr")
 library("readr")
 library("ggmap")
 library("mapproj")
 library("ggplot2")
+library("rgdal")
 ```
 
 ##Load and wrangle the data
 ```{r, data_wrangling, message=FALSE, warning=FALSE}
-
-library("dplyr")
-library("tidyr")
-library("readr")
-
 ## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub
 
 dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
@@ -89,8 +89,6 @@ dat_crime <- dat_crimefinal
 
 
 ```{r, Visualizations, message=FALSE, warning=FALSE}
-#loading library ggmap
-library(ggmap)
 
 #Assigning longitude and latitude to x and y
 x <- dat_crimefinal$X
@@ -115,10 +113,9 @@ plot<- ggmap(map_SF, extent = "panel", maprange=FALSE) +
    theme(legend.position = "none")+ ggtitle("All crime categories for wrangled data with zip code boundaries")
 
 #Layer zip codes on above mao
-#install.packages('rgdal')
-library(rgdal)
+
 #Zip <- readOGR(".","SFZipCodes")
-Zip <- readOGR(dsn=path.expand("/Users/mehta/OneDrive/Documents/Harvard/Intro to Data science/HomeWorkSubmissions/sfzipcodes"), layer = "SFZipCodes")
+Zip <- readOGR(dsn=path.expand("./sfzipcodes"), layer = "SFZipCodes")
 
 Zip <- spTransform(Zip, CRS("+proj=longlat +datum=WGS84"))
 Zip <- fortify(Zip)
@@ -247,8 +244,6 @@ ggmap(map_SF_1) +
 
 ##The three paths and their associated neighborhood crime
 ```{r walking paths + crime points, message=FALSE, warning=FALSE}
-#install.packages("fields")
-#library("fields")
 
   ##Count the number of route steps
   ###Take off a count, as the last line the in vector is not a movement point
