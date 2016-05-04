@@ -96,14 +96,6 @@ rm(dat_crimeNew)
 rm(dat_occ)
 ```
 
-
-```{r, wrangling_clean_up, echo=FALSE, message=FALSE}
-
-
-dat_crime <- dat_crimefinal
-
-```
-
 #Visualizations
 
 
@@ -213,55 +205,53 @@ TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
 
 ```
 
-##San Francisco map with all wrangled crime points
+##Three Amigos Navigation
 ```{r ggmap plus points, message=FALSE, warning=FALSE}
 ##This section is focused on showing the coverage of the crime data points  
-
   ##Zoomed map of the wrangled crime points for the whole San Francisco area
 map_SF <- get_map(location = "San Francisco, CA", zoom = 13)
 
 ggmap(map_SF) +
-    geom_jitter(data = dat_crimefinal, aes(X, Y), alpha=0.2, size=0.5, color="red") 
+  ggtitle("All San Francisco crime posing risk to walkers") +  
+  geom_jitter(data = dat_crimefinal, aes(X, Y), alpha=0.2, size=0.5, color="red") 
   ##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
 ```
 
-##The three choosen paths from our hotel at St. Regis
 ```{r, find walking paths, message=FALSE, warning=FALSE}
+####Calculate the three routes and display a simple navigation view
 
-##2 mile walk # North bound
+##2 mile walk # North bound walking path # Aquarium of the Bay
 walking_from_1 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
   walking_to_1 <- "2 Beach St, San Francisco, CA 94133"  #Aquarium of the Bay
   walking_route_1 <- route(walking_from_1, walking_to_1, structure = 'route', 
                            mode = 'walking', alternative = FALSE)
-##2 mile walk # West bound
+##2 mile walk # West bound walking path # Painted Ladies
 walking_from_2 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
   walking_to_2 <- "Painted Ladies, Steiner Street, San Francisco, CA 94117"  #Painted Ladies
   walking_route_2 <- route(walking_from_2, walking_to_2, structure = 'route', 
                            mode = 'walking', alternative = FALSE)
-##~1 mile walk # East bound
+##~1 mile walk # East bound walking path # Cupid's Span # We'll be walking this route twice.
 walking_from_3 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
   walking_to_3 <- "369 The Embarcadero, San Francisco, CA 94105"  #Cupid's Span
   walking_route_3 <- route(walking_from_3, walking_to_3, structure = 'route', 
                            mode = 'walking', alternative = FALSE)
 
-  ##Need to figure out how to auto-focus the map
+  ##Center the map for the walking paths
 map_SF_1 <- get_map(location = "500 California St, San Francisco, CA 94104", zoom = 14)
 
-
+  ##Create a simple map to show the three walking paths
+    ##Create the third route double thick since we're talking the route twice
 ggmap(map_SF_1) + 
-    geom_path(data = walking_route_1,
+  ggtitle("Three 2-mile walking paths from St. Regis") +  
+  geom_path(data = walking_route_1,
         aes(x = lon, y = lat), color="brown", size = 1.5, lineend='round') + 
     geom_path(data = walking_route_2,
-        aes(x = lon, y = lat), color="gray", size = 1.5, lineend='round'
-    ) + 
+        aes(x = lon, y = lat), color="gray", size = 1.5, lineend='round') + 
     geom_path(data = walking_route_3,
-        aes(x = lon, y = lat), color="tan", size = 1.5, lineend='round'
-    )
-#https://rpubs.com/nickbearman/r-google-map-making
-#https://www.google.com/maps/dir/Coit+Tower,+1+Telegraph+Hill+Blvd,+San+Francisco,+CA+94133/Cable+Car+Museum,+Mason+Street,+San+Francisco,+CA/@37.7991066,-122.4139408,16z/data=!3m1!4b1!4m13!4m12!1m5!1m1!1s0x8085808c40000001:0xde85b80121f2dd44!2m2!1d-122.4058222!2d37.8023949!1m5!1m1!1s0x808580f2960c5a5f:0xdfcd6cebc1ae9a35!2m2!1d-122.411488!2d37.7946268
+        aes(x = lon, y = lat), color="tan", size = 3, lineend='round')
+##Credit # https://rpubs.com/nickbearman/r-google-map-making
 ```
 
-##The three paths and their associated neighborhood crime
 ```{r walking paths + crime points, message=FALSE, warning=FALSE}
 
   ##Count the number of route steps
@@ -290,16 +280,17 @@ route_2_mWest <- min(walking_route_2$lon[1:(walking_route_2_hop_count)])
 route_3_mWest <- min(walking_route_3$lon)
   
   #Find the crime points from the wrangled that within the neighborhood of the respective walking path/route.
+    ##We use the North, South, East, & West points to constrain the data for the respective paths
+      ##The constrained dataset is called the route's neighborhood; the crime impacting a walking path
 dat_crimefinal_route_1 <- dat_crimefinal %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.0001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
-
 dat_crimefinal_route_2 <- dat_crimefinal %>% filter(Y <= (route_2_mNorth + 0.0001),Y >= (route_2_mSouth - 0.0001),X >= (route_2_mWest - 0.001), X <= (route_2_mEast + 0.001))
-
 dat_crimefinal_route_3 <- dat_crimefinal %>% filter(Y <= (route_3_mNorth + 0.0001),Y >= (route_3_mSouth - 0.0001),X >= (route_3_mWest - 0.001), X <= (route_3_mEast + 0.001))
 
 
-##This just renders the crime within the lat/lon constraints of how the map was centered
+##Render the three walking paths, end points, and neighborhood crime points
 ggmap(map_SF_1)  + 
-
+  
+  ggtitle("Three paths and their neighborhood crime") +
       ## Start with mapping the in-scope crime data points
   geom_jitter(data = dat_crimefinal_route_1, aes(X, Y), alpha=0.3, size=1, color="purple") +
   geom_jitter(data = dat_crimefinal_route_2, aes(X, Y), alpha=0.3, size=1, color="blue") +
@@ -330,46 +321,33 @@ ggmap(map_SF_1)  +
 ```
 
 ```{r, three path statistics for path decision, message=FALSE, warning=FALSE}
-#dat_crime # All wrangled full data set
-#dat_crime_routes # Crime points within the choosen path's neighborhoods
 
-# Crime categories = life[*0.6], nuisance[(0.1], property[*0.3]
-  ##Combine all three individual routes into a single data fram
+  ##Combine all three individual routes into a single data frame
 dat_crimefinal_route_1 <- dat_crimefinal_route_1 %>% mutate(path = 1)
 dat_crimefinal_route_2 <- dat_crimefinal_route_2 %>% mutate(path = 2)
 dat_crimefinal_route_3 <- dat_crimefinal_route_3 %>% mutate(path = 3)
 dat_crimefinal_routes <- rbind(dat_crimefinal_route_1, dat_crimefinal_route_2, dat_crimefinal_route_3)
-  ## Clean-up variables no longer required
-#rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
 
  dat_crimefinal_routes <- dat_crimefinal_routes %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
 
-#prop.table(table(dat_crime_routes %>% group_by(path, class)))
-
-#prop.table(table(filter(dat_crime_routes,path ==1)))
-
-#dat_crime_routes %>% group_by(path, class) %>% summarise(n())
-#dat_crime_routes %>% group_by(path, class)
-
+## We wanted to factor the categorized crime higher by a factor of 6, the threat to property by a factor of 3, and nuisance as our baseline.
+  # Crime categories = life[*0.6], nuisance[(0.1], property[*0.3]
+##Calculating the RISK for path ONE
 route_1_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==1, class == "Life") %>% nrow() * 0.6
 route_1_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==1, class == "Nui") %>% nrow() * 0.3
 route_1_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==1, class == "Prop") %>% nrow() * 0.1
 route_1_crime_relative_risk <- route_1_crime_ct_Life + route_1_crime_ct_Nui + route_1_crime_ct_Prop
-
+##Calculating the RISK for path TWO
 route_2_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==2, class == "Life") %>% nrow() * 0.6
 route_2_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 0.3
 route_2_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==2, class == "Prop") %>% nrow() * 0.1
 route_2_crime_relative_risk <- route_2_crime_ct_Life + route_2_crime_ct_Nui + route_2_crime_ct_Prop
-
+##Calculating the RISK for path THREE
+  #Notice that the crime occurances are duplicated since we're walking this path twice
 route_3_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==2, class == "Life") %>% nrow() * 2 *0.6
 route_3_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 2* 0.3
 route_3_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==2, class == "Prop") %>% nrow() *2* 0.1
 route_3_crime_relative_risk <- route_3_crime_ct_Life + route_3_crime_ct_Nui + route_3_crime_ct_Prop
-
-#route_1_crime_relative_risk
-#route_2_crime_relative_risk
-#route_3_crime_relative_risk
-
 
   ##Route risk ranking, 10 being worst risk
   ##Make this dynamic in the map rendering
@@ -378,16 +356,18 @@ route_risk_rank_2 <- c(2, round(route_2_crime_relative_risk/ max(route_1_crime_r
 route_risk_rank_3 <- c(3, round(route_3_crime_relative_risk / max(route_1_crime_relative_risk,route_2_crime_relative_risk,route_3_crime_relative_risk) * 10))
 route_risk_rank <- rbind(route_risk_rank_1, route_risk_rank_2, route_risk_rank_3)
 colnames(route_risk_rank) <- c("path", "risk_rank")
-
+data.frame(route_risk_rank)
 ```
 
-##Three paths and heat map of the in-scope crime points 
+
 ```{r, three paths& heat map, message=FALSE, warning=FALSE}
+##Render a navigation path, with the preferred path emphasized, and relative heatmaps
 
-
-W <- dat_crimefinal_route_1
 ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
-      ##Create heatmap for neighborhood #1
+  ggtitle("Preferred path emphasized and relative heatmaps") +
+   ##Add in x and y axis labels
+  xlab("Longitude")+ylab("Latitude") +
+##Create heatmap for neighborhood #1
    geom_density2d(data = dat_crimefinal_route_1, aes(x = X, y = Y)) +
    stat_density2d(data = dat_crimefinal_route_1, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
                   size = 0.01, geom = 'polygon') + #, bins = 16
@@ -401,7 +381,8 @@ ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
   geom_density2d(data = dat_crimefinal_route_3, aes(x = X, y = Y)) +
    stat_density2d(data = dat_crimefinal_route_3, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
   
-      ## Next, lay out the walking paths for the three routes.
+  ## Next, lay out the walking paths for the three routes.
+      ##Emphasize the route#1 as the preferred path
   geom_path(data = walking_route_1,
         aes(x = lon, y = lat), color="blue", size = 2.5, lineend='round') +
   geom_path(data = walking_route_2,
@@ -409,7 +390,7 @@ ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
   geom_path(data = walking_route_3,
         aes(x = lon, y = lat), color="red", size = 1.5, lineend='round') +
   
-    ##Dot & label for Starting Point
+  ##Dot & label for Starting Point
   geom_point(data=walking_route_1[1,],  color="white", size=6) +
   geom_label(data=walking_route_1[1,], label="St. Regis", hjust=0.2, vjust=2.0, size=5 ) +
   
@@ -419,9 +400,7 @@ ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
   geom_point(data=walking_route_2[walking_route_2_hop_count,],  color="yellow", size=4) +
     geom_label(data=walking_route_2[walking_route_2_hop_count,], label="Painted Ladies", vjust=1.5, size=5)+
   geom_point(data=walking_route_3[walking_route_3_hop_count,],  color="yellow", size=4) +
-    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5) +
- ##Add in x and y axis labels
-  xlab("Longitude")+ylab("Latitude")
+    geom_label(data=walking_route_3[walking_route_3_hop_count,], label="Cupid's Span", vjust=-1, size=5)
 
 ```
 
