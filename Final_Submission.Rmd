@@ -23,36 +23,52 @@ library("rgdal")
 
 ##Load and wrangle the data
 ```{r, data_wrangling, message=FALSE, warning=FALSE}
-## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub
+## dat_crime <- read.csv(unz("https://github.com/avennu01/three-amigos/blob/master/train.csv.zip","train.csv")) .. unable to direclty read data from GitHub so we have opted to load from Dropbox. 
 
 dat_crime <- read.csv("https://www.dropbox.com/s/kjkt5ndf3jkibq4/train.csv?raw=1")
 
-#table(dat_crime$Category)
+# Listing the categories from inital train dataset. 
+
+table(dat_crime$Category)
 
 # seperating Dates in to Date & Time and selecting below categories only, rest have been eliminated based on group consensus since they dint have impact on our end objective
 
-# Missing Person .. Need more deepdive 
-
 dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC","VANDALISM","VEHICLE THEFT"))
+
+# Examining the frequency of "Category" & subcategory : "Descripts"  
 
 dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
 
-# Based of above table, below considerations have been made 
-# Descripts to consider apart from one's selected .... ASSAULT, BATTERY,STALKING,LOITERING,
-# complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE"
-# complete categories to ingore "VANDALISM","VEHICLE THEFT"
+# Based of above table, below considerations have been made and data has been filtered
+# 1. complete categories to consider "KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE"
+# 2. complete categories to ingore "VANDALISM","VEHICLE THEFT"
 
 dat_crimeNew <- dat_crime %>% separate(col = Dates, into = c("Date","Time"), sep = " ",fill = "right" ) %>% filter(Category %in% c("ASSAULT","DISORDERLY CONDUCT","DRUNKENNESS","DRUG/NARCOTIC","KIDNAPPING","LARCENY/THEFT","LOITERING","MISSING PERSON","NON-CRIMINAL","ROBBERY","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","STOLEN PROPERTY","SUSPICIOUS OCC"))
 
+# Examining the frequency of "Category" & subcategory : "Descripts" after filtering
+
 dat_occ <- dat_crimeNew %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+# Below is preparation for creating function : "select_desc" in order simplfy the filtering process across "Descripts"
+
+# 1. Initally spread the data inorder to select rather than filter, which makes things easier 
+# 2. Create a vector which contains common terms across "Descripts" rather choosing whole description.
 
 p <- dat_occ %>% spread(Descript,occurence)
 
 final_desc <- c("AGGRAVATED ASSAULT WITH","ASSAULT, AGGRAVATED, W/","ATTEMPTED HOMICIDE WITH","ATTEMPTED MAYHEM WITH","ATTEMPTED SIMPLE","BATTERY WITH","MAYHEM WITH","THREATS AGAINST","WILLFUL CRUELTY","COMMITTING PUBLIC","DISTURBING THE PEAC","MAINTAINING A PUBLIC","FOR SALE","SALE OF","UNDER INFLUENCE","UNDER THE INFLUENCE","ATTEMPTED PETTY THEFT","GRAND THEFT PICK","GRAND THEFT PURSE","PETTY THEFT","THEFT, DRUNK ROLL,","AIDED CASE, DOG","AIDED CASE, INJURED","ASSAULT TO ROB WITH ","ATTEMPTED ROBBERY ON THE STREET","ATTEMPTED ROBBERY WITH","ROBBERY ON THE STREET ","ROBBERY, ARMED WITH A ","ROBBERY, BODILY","ASSAULT BY JUVENILE","SHOOTING BY JUVENILE","ANNOY OR MOLEST","STOLEN CELLULAR PHONE","STOLEN ELECTRONICS","SUSPICIOUS A","SUSPICIOUS OCCU","SUSPICIOUS PER","MISSING")
 
+# 3. Creating a function to select only values which are mentioned in specified vector 
+
 select_desc <- function(x) { 
                    names(p %>% select(contains(x)))[-1]
       }
+
+
+# 4. Applying our above function to our "final_desc" vector and filtering only for values which contain our required descriptions 
+
+# 5. Now once the required descriptions are obtained , we filtering this set from our dat_crimeNew dataset and then joining  this table to a new table we created to contain only complete categories mentioned above ("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE") without any filtering @ description level ... this gives us our final dataset to workon. 
+
 
 dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(final_desc,select_desc))),dat_crimeNew %>% filter(Category %in% c("KIDNAPPING","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE")))
 
@@ -61,11 +77,14 @@ dat_crimefinal <- full_join(dat_crimeNew %>% filter(Descript %in% unlist(lapply(
 #dim(dat_crimeNew)
 #dim(dat_crimefinal)
 paste("Original raw data set was ", nrow(dat_crime), " observances.")
-paste("Original raw data set was BLA BLA", nrow(dat_crimeNew), " observances.")
+paste("Original raw data set after inital category filterting was ", nrow(dat_crimeNew), " observances.")
 paste("Lastly, all data not impacting a pedistrian was removed, leaving", nrow(dat_crimefinal), " observances.")
 
-# Based on the dat_occ_final we can categorise the level of serverity of crime if we want to show our results in such manner 
+# Examining the frequency of "Category" & subcategory : "Descripts" after final filtering
+
 dat_occ_final <- dat_crimefinal %>% group_by(Category,Descript) %>% summarize(occurence= n())
+
+# Based on the dat_occ_final we categorised the level of serverity of crime by, "life", "property" & "nuisance" 
 
 cat_life <- dat_crimefinal %>% filter(Category %in% c("ASSAULT","KIDNAPPING","MISSING PERSON","SECONDARY CODES","SEX OFFENSES FORCIBLE","SEX OFFENSES NON FORCIBLE","SUSPICIOUS OCC"))
 cat_prop <- dat_crimefinal %>% filter(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"))
