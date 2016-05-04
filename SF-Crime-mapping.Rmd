@@ -5,20 +5,15 @@ date: "April 21, 2016"
 output: html_document
 ---
 
-```{r, setup, echo=FALSE, message=FALSE, warning=FALSE}
+```{r, library packages setup, echo=FALSE, message=FALSE, warning=FALSE}
 rm(list=ls()) ##Clear workingspace
 
 library("dplyr")
 library("tidyr")
 library("readr")
 library("ggmap")
-#install.packages("rworldmap")
-#library("rworldmap")
-#install.packages("mapproj")  ##Here in case you need to load
 library("mapproj")
 library("ggplot2")
-#install.packages("repmis")
-#library("repmis")
 ```
 
 ##Load and wrangle the data
@@ -205,6 +200,7 @@ ggmap(map_SF) +
 
 ##The three choosen paths from our hotel at St. Regis
 ```{r, find walking paths, echo=FALSE, message=FALSE, warning=FALSE}
+##
 
 ##2 mile walk # North bound
 walking_from_1 <- "125 3rd Street, San Francisco, CA 94103" #St. Regis SF
