@@ -12,13 +12,8 @@ library("dplyr")
 library("tidyr")
 library("readr")
 library("ggmap")
-#install.packages("rworldmap")
-#library("rworldmap")
-#install.packages("mapproj")  ##Here in case you need to load
 library("mapproj")
 library("ggplot2")
-#install.packages("repmis")
-#library("repmis")
 ```
 
 ##Load and wrangle the data
@@ -76,17 +71,15 @@ cat_life <- dat_crimefinal %>% filter(Category %in% c("ASSAULT","KIDNAPPING","MI
 cat_prop <- dat_crimefinal %>% filter(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"))
 cat_nui <- dat_crimefinal %>% filter(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"))
 
-
-
-##My attempt to load the external RMD
-#http://zevross.com/blog/2014/07/09/making-use-of-external-r-code-in-knitr-and-r-markdown/
+  ##Clean up vectors no longer required
+rm(dat_crime)
+rm(dat_crimeNew)
+rm(dat_occ)
 ```
 
 
 ```{r, wrangling_clean_up, echo=FALSE, message=FALSE}
-rm(dat_crime)
-rm(dat_crimeNew)
-rm(dat_occ)
+
 
 dat_crime <- dat_crimefinal
 
@@ -206,11 +199,13 @@ TimeOfDay + stat_summary(fun.y = sum, geom = "bar", fill = "grey") +
 
 ##San Francisco map with all wrangled crime points
 ```{r ggmap plus points, message=FALSE, warning=FALSE}
-  ##Zoomed map of the wrangled crime points for the southern district area
+##This section is focused on showing the coverage of the crime data points  
+
+  ##Zoomed map of the wrangled crime points for the whole San Francisco area
 map_SF <- get_map(location = "San Francisco, CA", zoom = 13)
-  ##Warning, this one looks like a mess
+
 ggmap(map_SF) +
-    geom_jitter(data = dat_crime, aes(X, Y), alpha=0.2, size=0.5, color="red") 
+    geom_jitter(data = dat_crimefinal, aes(X, Y), alpha=0.2, size=0.5, color="red") 
   ##From: http://www.r-bloggers.com/map-biodiversity-records-with-rgbif-and-ggmap-packages-in-r/
 ```
 
@@ -281,20 +276,20 @@ route_2_mWest <- min(walking_route_2$lon[1:(walking_route_2_hop_count)])
 route_3_mWest <- min(walking_route_3$lon)
   
   #Find the crime points from the wrangled that within the neighborhood of the respective walking path/route.
-dat_crime_route_1 <- dat_crime %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.0001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
+dat_crimefinal_route_1 <- dat_crimefinal %>% filter(Y <= (route_1_mNorth + 0.0001),Y >= (route_1_mSouth - 0.0001),X >= (route_1_mWest - 0.001), X <= (route_1_mEast + 0.001))
 
-dat_crime_route_2 <- dat_crime %>% filter(Y <= (route_2_mNorth + 0.0001),Y >= (route_2_mSouth - 0.0001),X >= (route_2_mWest - 0.001), X <= (route_2_mEast + 0.001))
+dat_crimefinal_route_2 <- dat_crimefinal %>% filter(Y <= (route_2_mNorth + 0.0001),Y >= (route_2_mSouth - 0.0001),X >= (route_2_mWest - 0.001), X <= (route_2_mEast + 0.001))
 
-dat_crime_route_3 <- dat_crime %>% filter(Y <= (route_3_mNorth + 0.0001),Y >= (route_3_mSouth - 0.0001),X >= (route_3_mWest - 0.001), X <= (route_3_mEast + 0.001))
+dat_crimefinal_route_3 <- dat_crimefinal %>% filter(Y <= (route_3_mNorth + 0.0001),Y >= (route_3_mSouth - 0.0001),X >= (route_3_mWest - 0.001), X <= (route_3_mEast + 0.001))
 
 
 ##This just renders the crime within the lat/lon constraints of how the map was centered
 ggmap(map_SF_1)  + 
 
       ## Start with mapping the in-scope crime data points
-  geom_jitter(data = dat_crime_route_1, aes(X, Y), alpha=0.3, size=1, color="purple") +
-  geom_jitter(data = dat_crime_route_2, aes(X, Y), alpha=0.3, size=1, color="blue") +
-  geom_jitter(data = dat_crime_route_3, aes(X, Y), alpha=0.3, size=1, color="orange") +
+  geom_jitter(data = dat_crimefinal_route_1, aes(X, Y), alpha=0.3, size=1, color="purple") +
+  geom_jitter(data = dat_crimefinal_route_2, aes(X, Y), alpha=0.3, size=1, color="blue") +
+  geom_jitter(data = dat_crimefinal_route_3, aes(X, Y), alpha=0.3, size=1, color="orange") +
 
       ##Add in x and y axis labels
   xlab("Longitude")+ylab("Latitude") +
@@ -326,14 +321,14 @@ ggmap(map_SF_1)  +
 
 # Crime categories = life[*0.6], nuisance[(0.1], property[*0.3]
   ##Combine all three individual routes into a single data fram
-dat_crime_route_1 <- dat_crime_route_1 %>% mutate(path = 1)
-dat_crime_route_2 <- dat_crime_route_2 %>% mutate(path = 2)
-dat_crime_route_3 <- dat_crime_route_3 %>% mutate(path = 3)
-dat_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
+dat_crimefinal_route_1 <- dat_crimefinal_route_1 %>% mutate(path = 1)
+dat_crimefinal_route_2 <- dat_crimefinal_route_2 %>% mutate(path = 2)
+dat_crimefinal_route_3 <- dat_crimefinal_route_3 %>% mutate(path = 3)
+dat_crimefinal_routes <- rbind(dat_crimefinal_route_1, dat_crimefinal_route_2, dat_crimefinal_route_3)
   ## Clean-up variables no longer required
 #rm(dat_crime_route_1, dat_crime_route_2, dat_crime_route_3)
 
- dat_crime_routes <- dat_crime_routes %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
+ dat_crimefinal_routes <- dat_crimefinal_routes %>% mutate(class = ifelse(Category %in% c("STOLEN PROPERTY","ROBBERY","LARCENY/THEFT"), "Prop", ifelse(Category %in% c("DISORDERLY CONDUCT","DRUG/NARCOTIC","DRUNKENNESS","NON-CRIMINAL"), "Nui", "Life")))
 
 #prop.table(table(dat_crime_routes %>% group_by(path, class)))
 
@@ -342,19 +337,19 @@ dat_crime_routes <- rbind(dat_crime_route_1, dat_crime_route_2, dat_crime_route_
 #dat_crime_routes %>% group_by(path, class) %>% summarise(n())
 #dat_crime_routes %>% group_by(path, class)
 
-route_1_crime_ct_Life <- dat_crime_routes %>% filter(path ==1, class == "Life") %>% nrow() * 0.6
-route_1_crime_ct_Nui <- dat_crime_routes %>% filter(path ==1, class == "Nui") %>% nrow() * 0.3
-route_1_crime_ct_Prop <- dat_crime_routes %>% filter(path ==1, class == "Prop") %>% nrow() * 0.1
+route_1_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==1, class == "Life") %>% nrow() * 0.6
+route_1_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==1, class == "Nui") %>% nrow() * 0.3
+route_1_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==1, class == "Prop") %>% nrow() * 0.1
 route_1_crime_relative_risk <- route_1_crime_ct_Life + route_1_crime_ct_Nui + route_1_crime_ct_Prop
 
-route_2_crime_ct_Life <- dat_crime_routes %>% filter(path ==2, class == "Life") %>% nrow() * 0.6
-route_2_crime_ct_Nui <- dat_crime_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 0.3
-route_2_crime_ct_Prop <- dat_crime_routes %>% filter(path ==2, class == "Prop") %>% nrow() * 0.1
+route_2_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==2, class == "Life") %>% nrow() * 0.6
+route_2_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 0.3
+route_2_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==2, class == "Prop") %>% nrow() * 0.1
 route_2_crime_relative_risk <- route_2_crime_ct_Life + route_2_crime_ct_Nui + route_2_crime_ct_Prop
 
-route_3_crime_ct_Life <- dat_crime_routes %>% filter(path ==2, class == "Life") %>% nrow() * 2 *0.6
-route_3_crime_ct_Nui <- dat_crime_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 2* 0.3
-route_3_crime_ct_Prop <- dat_crime_routes %>% filter(path ==2, class == "Prop") %>% nrow() *2* 0.1
+route_3_crime_ct_Life <- dat_crimefinal_routes %>% filter(path ==2, class == "Life") %>% nrow() * 2 *0.6
+route_3_crime_ct_Nui <- dat_crimefinal_routes %>% filter(path ==2, class == "Nui") %>% nrow() * 2* 0.3
+route_3_crime_ct_Prop <- dat_crimefinal_routes %>% filter(path ==2, class == "Prop") %>% nrow() *2* 0.1
 route_3_crime_relative_risk <- route_3_crime_ct_Life + route_3_crime_ct_Nui + route_3_crime_ct_Prop
 
 #route_1_crime_relative_risk
@@ -376,21 +371,21 @@ colnames(route_risk_rank) <- c("path", "risk_rank")
 ```{r, three paths& heat map, message=FALSE, warning=FALSE}
 
 
-W <- dat_crime_route_1
+W <- dat_crimefinal_route_1
 ggmap(map_SF_1, extent = "panel", maprange=FALSE) +
       ##Create heatmap for neighborhood #1
-   geom_density2d(data = dat_crime_route_1, aes(x = X, y = Y)) +
-   stat_density2d(data = dat_crime_route_1, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
+   geom_density2d(data = dat_crimefinal_route_1, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crimefinal_route_1, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..),
                   size = 0.01, geom = 'polygon') + #, bins = 16
    scale_fill_gradient(low = "blue", high = "red") +
    scale_alpha(range = c(0.00, 0.75), guide = FALSE) +
    theme(legend.position = "none", axis.title = element_blank(), text = element_text(size = 12))+
 ##Create heatmap for neighborhood #2
-  geom_density2d(data = dat_crime_route_2, aes(x = X, y = Y)) +
-   stat_density2d(data = dat_crime_route_2, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
+  geom_density2d(data = dat_crimefinal_route_2, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crimefinal_route_2, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
 ##Create heatmap for neighborhood #3
-  geom_density2d(data = dat_crime_route_3, aes(x = X, y = Y)) +
-   stat_density2d(data = dat_crime_route_3, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
+  geom_density2d(data = dat_crimefinal_route_3, aes(x = X, y = Y)) +
+   stat_density2d(data = dat_crimefinal_route_3, aes(x = X, y = Y,  fill = ..level.., alpha = ..level..), size = 0.01, geom = 'polygon') + #, bins = 16
   
       ## Next, lay out the walking paths for the three routes.
   geom_path(data = walking_route_1,
