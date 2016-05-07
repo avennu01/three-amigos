@@ -28,7 +28,7 @@
  <p>Our project motivation was to analyze data that was easy to relate to.</p>
  
   <P> Hence starts the journey of three amigos, with the accomodation set at St.Regis in downtown SFO each of them had they own favourite destiantion in mind for a quick jog 
-  but would only do so if other two are also intrested in the same spot. Hmm ... conflict of intrest and also how would one convince other or both to agree 
+  but would only do so if other two are also intrested in the same spot. Hmm ... conflict of interest and also how would one convince other or both to agree 
   with one's choice. They started flipping coins and rolling dice but none would give them the answer they seek, here comes data analytics to the rescue. </P>
   
   <p> With SFO crime data readily available,we wanted to see if we can identify some relationships with likely variables and come up with practical recommendations as to 
@@ -39,7 +39,7 @@
 <a id="project-objectives" class="anchor" href="#project-objectives" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Project Objectives</strong>:</h1>
 
 <p>Analyze the San Francisco Crime data set provide by Kaggle.com to predict the likelihood of certain crime occurances and suggesting a better path among the 3 chosen routes 
-which start with a common starting point St.Regis and ending in Aquarium of the Bay,Paintied Ladies and Cupid's Span respectively.</p> 
+which start with a common starting point St.Regis and ending in either Aquarium of the Bay,Paintied Ladies or Cupid's Span respectively.</p> 
 
 
 <h1>
@@ -67,9 +67,9 @@ which start with a common starting point St.Regis and ending in Aquarium of the 
   point A to point B.</p>
    <p>Our third and final phase of wrangling, was to filter out unneccessary obervations based on "Descript"s identified in second stage of 
    filtering and making sure we arrive to final dataset which is relevant to our end objective of WALKING\JOGGING.</p>
-                      <p>we have initially started around 875K observatoins and have systematically wrangled data to arrive 
+                      <p>we have initially started around 875K observations and have systematically wrangled data to arrive 
     at around 195K crime observations which have an impact on person WALKING\JOGGING in the areas discussed</p>
- <  </li>
+ </li>
  
  <li>Visualization :
  <p> Using the finalized wrangled data below shows all categories of crime, which clearly shows concentration near the northeastern section 
@@ -77,12 +77,15 @@ which start with a common starting point St.Regis and ending in Aquarium of the 
                      <p>For reference, we’ve provided zip code boundaries as overlay.</p>
   <img src="images/pic1.png">
   
-   <p> We have further created 3 categories based on the severity and threat level to life:Property, Life and Nuisance.</p>
+   <p> We have further created 3 categories based on the severity and threat level to life:</p> 
+           <p>Property : Theft, Robbery, etc.,</p> 
+           <p>Life : Kidnapping, Sex Offenses, etc.,</p>
+           <p>Nuisance : Loitering, Drunkeness, etc.,</p>
    
 <p>Life related crimes such as assault, kidnapping, missing persons, and sex offenses have a much wider footprint 
    mainly due to the number and prevalence of assault related crimes. Whereas nuisance related crimes such as 
    disorderly conduct, drug/narcotic, drunkenness, and non-criminal are very much concentrated in one region.
-   Below map provides crime density views of the</p>
+   Below map provides crime density views of the same.</p>
   <img src="images/pic2.PNG">
   
   <p> Per the histogram below, larceny and theft crime top the chart at above 70,000 occurrences, followed by 
@@ -104,10 +107,30 @@ which start with a common starting point St.Regis and ending in Aquarium of the 
   <img src="images/pic5.png">
   
   <li>Proximity Analysis 
+  <p>As seen above in the Data Wrangling and Exploratory Analysis, we have arrived at understanding the crime that negatively impacts 
+  pedestrians in San Francisco.  The data set also provides coordinates for where the crime was reported, so we first wanted to start 
+  with a ‘birds eye view’.</p>
+  
   <img src="images/pic6.png">
   
-  <img src="images/pic7.PNG">
+  <p>Even though we can see all this crime, the Three Amigos decide that we still want to venture from our hotel at the St. Regis in 
+  the Southern district for a two mile walk.  We have three options: 1) walk 2 miles to the Aquarium of the Bay, 2) walk 2 miles to the 
+  Painted Ladies, or 3) walk a 2 mile round trip to Cupid’s Span and back.<p/>
+
+  <p> On the first image on the left, you’ll see that we have outlined the three paths heading North, South-West, or East.
+  Then to the right, the same three paths are now associated with the crime of their respective neighborhood crime. The neighborhood crime 
+  is close enough in proximity to pose a threat to us as we walk.</P>
+
+ <p>So the desire is to pick the route with the least risk as a try to improve our health with a brisk walk.</p>
   
+  <img src="images/pic7.PNG">
+  <p> In order to figure out which path posed the least risk, we pulled out our calculators. We decided to consider the three classifications 
+  of crime in order of severity life, property, and nuisance by factoring each in a descending scale (6, 3, & 1 respectively). To this end, we 
+  were able to add the three respective path’s neighborhood crime into a weighted score based on this adjusted scale.  The walk to the Aquarium of the Bay 
+  proved to be the safest route.</p>
+
+ <p>To show the relative crime density points, we overlaid a heat map of the respective neighborhood crime.  Based upon this, we’ll be walking 
+ a little bit faster in a few sections of our walk to the Aquarium.  Even though we’ve determine the lower risk path, it still has risk.</p>
   <img src="images/pic8.png">
 
   </li>
