@@ -58,21 +58,22 @@ as it is the only full-featured data set. </p>
 <a id="analysis" class="anchor" href="#analysis" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a><strong>Analysis</strong>:</h1>
 
  <ul>
- <li>Data Wrangling : <p> We started working with the SFO Crime training dataset readily available. The initial challenge was to identify the categories which are related 
+ <li>Data Wrangling : 
+        <p> We started working with the SFO Crime training dataset readily available. The initial challenge was to identify the categories which are related 
  to our end objective. The provided dataset had multiple categories labeled as "Category" and each category was further subdivided in to multiple sub-categories here labeled 
  as "Descript" based on the act committed. There were few "Category"s and their "Descript"s which were outright not relevant to our cause and hence were filtered out 
  to mention few "BAD CHECKS", "GAMBLING", etc. </p>
-   <p>Our second phase of wrangling was to closely examine "Descript"s and to filter out any non-relevant descriptions from this Category, for example "ASSAULT" category 
-   though is relevant to our case, acts such as "inflict injury on cohabitee", "threatening phone calls" and similar others are not relevant to a person whose mode of transportation 
-   is WALKING/JOGGING from point A to point B.</p>
-   <p>Our third and final phase of wrangling was to filter out unnecessary observations based on "Descript"s identified in second stage of filtering and make sure we arrive to 
+        <p>Our second phase of wrangling was to closely examine "Descript"s and to filter out any non-relevant descriptions from this Category, for example "ASSAULT" category 
+  though is relevant to our case, acts such as "inflict injury on cohabitee", "threatening phone calls" and similar others are not relevant to a person whose mode of transportation 
+  is WALKING/JOGGING from point A to point B.</p>
+       <p>Our third and final phase of wrangling was to filter out unnecessary observations based on "Descript"s identified in second stage of filtering and make sure we arrive to 
    final dataset which is relevant to our end objective of WALKING/JOGGING.</p>
-   <p>We have initially started around 875K observations and have systematically wrangled data to arrive at around 195K crime observations which have an 
-   impact on person WALKING/JOGGING in the areas discussed.</p>
+  <p>We have initially started around 875K observations and have systematically wrangled data to arrive at around 195K crime observations which have an 
+  impact on person WALKING/JOGGING in the areas discussed.</p>
  </li>
  
  <li>Exploratory Analysis :
- <p> Using the finalized wrangled data below shows all categories of crime, which clearly shows concentration near the northeastern section of the city. This map provided us with the 
+        <p> Using the finalized wrangled data below shows all categories of crime, which clearly shows concentration near the northeastern section of the city. This map provided us with the 
  guidance on which areas we needed to concentrate for further analysis.</p>
                      <p>For reference, we’ve provided zip code boundaries as overlay.</p>
   <img src="images/pic1.png">
@@ -105,7 +106,7 @@ crime density views of the same.</p>
   <img src="images/pic5.png">
   
   <li>Proximity Analysis :
-  <p>As seen above in the Data Wrangling and Exploratory Analysis, we have arrived at the crime data set of offenses that negatively impact pedestrians in San Francisco. 
+      <p>As seen above in the Data Wrangling and Exploratory Analysis, we have arrived at the crime data set of offenses that negatively impact pedestrians in San Francisco. 
   The data set also provides coordinates for where the crime was reported, so we wanted to start with a ‘bird's eye view’.</p>
   
   <img src="images/pic6.png">
